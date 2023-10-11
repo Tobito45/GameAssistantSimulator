@@ -1,0 +1,12 @@
+Saved game number1:
+Time was: 20 seconds
+================================================
+1 - Client
+Correct items was: 4
+All items was: 4
+Profit: +2,86
+Lesion: -0
+How much can we get: 2,86
+How much we get: 2,86
+
+Your scope is: 2,86

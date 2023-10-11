@@ -1,0 +1,22 @@
+[
+  {
+    "PathImage": "Images/donut",
+    "Name": "Donut",
+    "Price": 0.79
+  },
+  {
+    "PathImage": "Images/pizza",
+    "Name": "Pizza",
+    "Price": 1.29
+  },
+  {
+    "PathImage": "Images/cake",
+    "Name": "Cake",
+    "Price": 2.29
+  },
+  {
+    "PathImage": "Images/cookie",
+    "Name": "Cookie",
+    "Price": 0.39
+  }
+]

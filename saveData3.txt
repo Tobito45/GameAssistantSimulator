@@ -1,0 +1,44 @@
+Saved game number3:
+Time was: 60 seconds
+================================================
+1 - Client
+Correct items was: 3
+All items was: 3
+Profit: +1,97
+Lesion: -0
+How much can we get: 1,97
+How much we get: 1,97
+================================================
+2 - Client
+Correct items was: 2
+All items was: 2
+Profit: +2,08
+Lesion: -0
+How much can we get: 2,08
+How much we get: 2,08
+================================================
+3 - Client
+Correct items was: 4
+All items was: 4
+Profit: +3,26
+Lesion: -0
+How much can we get: 3,26
+How much we get: 3,26
+================================================
+4 - Client
+Correct items was: 2
+All items was: 2
+Profit: +1,68
+Lesion: -0
+How much can we get: 1,68
+How much we get: 1,68
+================================================
+5 - Client
+Correct items was: 3
+All items was: 3
+Profit: +2,07
+Lesion: -0
+How much can we get: 2,07
+How much we get: 2,07
+
+Your scope is: 11,06
