@@ -22,16 +22,15 @@ public class ClientGenerator : MonoBehaviour
     [SerializeField]
     private GameObject[] _clientsPrefabs;
 
-    private GameObject _aktualClient;
+    private GameObject[] _aktualClient = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
 
     [Header("Way")]
-    [SerializeField]
-    private Transform[] wayPoints;
-    private Transform _aktualTransform;
+    public InspectorArray<Transform[]>[] wayPoints;
+    private Transform[] _aktualTransform = new Transform[KeyboardAndJostickController.MAXPLAYERS];
     private bool _isRotating = false;
 
     [SerializeField]
-    private Transform _spawnTransform;
+    private Transform[] _spawnTransform;
 
     public event Action OnClientDestroy;
 
@@ -40,21 +39,21 @@ public class ClientGenerator : MonoBehaviour
         _goods.AfterPay += ClientPayed;
     }
 
-    public void SpawnClient()
+    public void SpawnClient(int index)
     {
-        if (_aktualClient == null)
+        if (_aktualClient[index] == null)
         {
-            _aktualClient = Instantiate(_clientsPrefabs[UnityEngine.Random.Range(0, _clientsPrefabs.Length)], _spawnTransform.position, _spawnTransform.rotation);
-            _aktualTransform = wayPoints[0];
+            _aktualClient[index] = Instantiate(_clientsPrefabs[UnityEngine.Random.Range(0, _clientsPrefabs.Length)], _spawnTransform[index].position, _spawnTransform[index].rotation);
+            _aktualTransform[index] = wayPoints[index].GetElements[0];
 
-            activeCoroutines.Add(StartCoroutine(MoveToPlayer(_aktualClient)));
+            activeCoroutines.Add(StartCoroutine(MoveToPlayer(_aktualClient[index], index)));
 
         }
     }
 
-    private IEnumerator MoveToPlayer(GameObject client)
+    private IEnumerator MoveToPlayer(GameObject client, int index)
     {
-        activeCoroutines.Add(StartCoroutine(MoveToTarget(client, _aktualTransform)));
+        activeCoroutines.Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
 
         if (client.GetComponent<Animator>() != null)
         {
@@ -72,16 +71,16 @@ public class ClientGenerator : MonoBehaviour
 
     }
 
-    private IEnumerator MoveToOutSide(GameObject client)
+    private IEnumerator MoveToOutSide(GameObject client, int index)
     {
         activeCoroutines.Add(StartCoroutine(RotateToTargetAngle(client, targetOut)));
         while (_isRotating)
         {
             yield return null;
         }
-        _aktualTransform = wayPoints[1];
+        _aktualTransform[index] = wayPoints[index].GetElements[1];
        
-        activeCoroutines.Add(StartCoroutine(MoveToTarget(client, _aktualTransform)));
+        activeCoroutines.Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
 
         if (client.GetComponent<Animator>() != null)
         {
@@ -100,10 +99,10 @@ public class ClientGenerator : MonoBehaviour
         StopCoroutine(lastCoroutine);
     }
 
-    private IEnumerator MoveToTarget(GameObject objToMove, Transform target)
+    private IEnumerator MoveToTarget(GameObject objToMove, Transform target, int index)
     {
-        if(_aktualClient.GetComponent<Animator>() != null)
-            _aktualClient.GetComponent<Animator>().SetBool("Walk", true);
+        if(_aktualClient[index].GetComponent<Animator>() != null)
+            _aktualClient[index].GetComponent<Animator>().SetBool("Walk", true);
         Vector3 startPosition = objToMove.transform.position;
         float elapsedTime = 0f;
 
@@ -122,8 +121,8 @@ public class ClientGenerator : MonoBehaviour
 
         // Убеждаемся, что объект точно достиг целевой точки
         objToMove.transform.position = target.position;
-        if (_aktualClient.GetComponent<Animator>() != null)
-            _aktualClient.GetComponent<Animator>().SetBool("Walk", false);
+        if (_aktualClient[index].GetComponent<Animator>() != null)
+            _aktualClient[index].GetComponent<Animator>().SetBool("Walk", false);
 
     }
 
@@ -167,9 +166,20 @@ public class ClientGenerator : MonoBehaviour
         activeCoroutines.Clear(); // Очистка списка активных корутин
     }
 
-    public void ClientPayed()
+    public void ClientPayed(int index)
     {
-        if(_aktualClient != null)
-            lastCoroutine = StartCoroutine(MoveToOutSide(_aktualClient));
+        Debug.Log("w3");
+        if (_aktualClient[index] != null)
+            lastCoroutine = StartCoroutine(MoveToOutSide(_aktualClient[index], index));
     }
+}
+
+[System.Serializable]
+public class InspectorArray<T>
+{
+    [SerializeField]
+    private T elements;
+
+    public T GetElements => elements;
+
 }

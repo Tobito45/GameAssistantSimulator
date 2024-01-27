@@ -48,7 +48,7 @@ public class MonitorGoodList : MonoBehaviour
         GameController.Instance.OnAddGood(good);
     }
 
-    public void ClearGoods()
+    public void ClearGoods(int i)
     {
         _goodList.Clear();
         foreach(Transform item in _goodsInScrollContent)

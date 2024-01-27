@@ -130,6 +130,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _qCodeObject: {fileID: 0}
+  _detectedMaterial: {fileID: 2100000, guid: cea0c4191eb5cb440aa5355d44958681, type: 2}
+  _selectedMaterial: {fileID: 2100000, guid: 2d6209e982156604ea6d7c513bc7b774, type: 2}
 --- !u!114 &6872119978916140692
 MonoBehaviour:
   m_ObjectHideFlags: 0

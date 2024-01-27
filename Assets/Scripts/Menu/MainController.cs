@@ -30,10 +30,8 @@ public class MainController : MonoBehaviour
 
     [Header("Camers")]
     [SerializeField]
-    private Camera _gameCamera;
+    private Camera[] _gameCamera;
 
-    public Camera GameCamera => _gameCamera;
-  
     [SerializeField]
     private Camera _mainCamera;
 
@@ -42,13 +40,17 @@ public class MainController : MonoBehaviour
         _inputField.text = basicTime.ToString();
         _startGameButton.onClick.AddListener(() => GameController.Instance.StartOfTheGame(float.Parse(_inputField.text)));
         textInfo.text = $"Today: {DateTime.Now.Day}.{DateTime.Now.Month} \nVersion: {Application.version}";
-        ActiveFirstDisactiveSecond(_mainCamera.gameObject, _gameCamera.gameObject);
+       // ActiveFirstDisactiveSecond(_mainCamera.gameObject, _gameCamera.gameObject);
+        _mainCamera.gameObject.SetActive(true);
+        GameController.Instance.SplitController.SetActiveCamers(false);
         ActiveFirstDisactiveSecond(_panelMenu, _panelGame);
     }
 
     public void PlayGame()
     {
-        ActiveFirstDisactiveSecond(_gameCamera.gameObject, _mainCamera.gameObject);
+        // ActiveFirstDisactiveSecond(_gameCamera.gameObject, _mainCamera.gameObject);
+        _mainCamera.gameObject.SetActive(false);
+        GameController.Instance.SplitController.SetActiveCamers(true);
         ActiveFirstDisactiveSecond(_panelGame, _panelMenu);
     }
 
@@ -66,7 +68,9 @@ public class MainController : MonoBehaviour
     public void OpenMenuAndCloseGame()
     {
         ActiveFirstDisactiveSecond(_panelMenu, _panelGame);
-        ActiveFirstDisactiveSecond(_mainCamera.gameObject,_gameCamera.gameObject);
+        GameController.Instance.SplitController.SetActiveCamers(false);
+        //ActiveFirstDisactiveSecond(_mainCamera.gameObject,_gameCamera.gameObject);
+        _mainCamera.gameObject.SetActive(true);
         
     }
     public void Exit() => Application.Quit();

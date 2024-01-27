@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RayDetect : MonoBehaviour
+public class RayDetect : MonoBehaviour //can be deleted
 {
     [SerializeField]
     private int index;
@@ -23,9 +23,9 @@ public class RayDetect : MonoBehaviour
     
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+     /*   if (Input.GetMouseButtonDown(0))
         {
-            StartRay();
+         //   StartRay();
         } else if (Input.GetMouseButtonUp(0))
         {
             _isRayActive = false;
@@ -48,7 +48,7 @@ public class RayDetect : MonoBehaviour
                 }
             }
    
-        }
+        }*/
     }
 
     private void StartRay()

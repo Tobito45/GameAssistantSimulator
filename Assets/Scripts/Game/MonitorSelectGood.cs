@@ -1,6 +1,8 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,18 +21,21 @@ public class MonitorSelectGood : MonoBehaviour
     [SerializeField]
     private Image _goodPrefab;
     [SerializeField]
-    private Transform _goodsInScrollContent;
+    private Transform[] _goodsInScrollContent;
     [SerializeField]
-    private MonitorGoodList _goodList;
+    private MonitorGoodList[] _goodList;
 
     [Header("UI")]
     [SerializeField]
-    private Button buttonPay;
+    private Button[] _buttonPay, _buttonAccept;
 
 
-    private GameObject SelectedObject;
+    private GameObject[] _selectedObject = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
 
-    public event Action AfterPay;
+    private List<GameObject>[] _objectsWillBeIterrated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
+    private int[] _indexForIterator = new int[KeyboardAndJostickController.MAXPLAYERS];
+
+    public  Action<int> AfterPay;
 
     private void Start()
     {
@@ -38,56 +43,96 @@ public class MonitorSelectGood : MonoBehaviour
         string jsonFile = json.ToString();
         SelectedDataJson[] dataObject = JsonConvert.DeserializeObject<SelectedDataJson[]>(jsonFile);
 
-        foreach (var item in dataObject)
+        for (int i = 0; i < _goodsInScrollContent.Length;i++)
         {
-            var obj = Instantiate(_goodPrefab, _goodsInScrollContent);
-            Sprite loadedSprite = Resources.Load<Sprite>(item.PathImage);
+            _indexForIterator[i] = -1;
+            _objectsWillBeIterrated[i] = new List<GameObject>();
+         
+            foreach (var item in dataObject)
+            {
+                var obj = Instantiate(_goodPrefab, _goodsInScrollContent[i]);
+                Sprite loadedSprite = Resources.Load<Sprite>(item.PathImage);
 
-            obj.transform.GetChild(0).gameObject.SetActive(false);
+                obj.transform.GetChild(0).gameObject.SetActive(false);
 
-            Transform button = obj.transform.GetChild(1);
-            button.GetComponent<Image>().sprite = loadedSprite;
-            var comp = button.AddComponent<GoodInfoSelect>();
-            comp.SetSelectInfo(item.Price, item.Name);
+                Transform button = obj.transform.GetChild(1);
+                button.GetComponent<Image>().sprite = loadedSprite;
+                var comp = button.AddComponent<GoodInfoSelect>();
+                comp.SetSelectInfo(item.Price, item.Name);
+                _objectsWillBeIterrated[i].Add(obj.gameObject);
 
-            button.GetComponent<Button>().onClick.AddListener(() => OnSelectObject(button.gameObject));
+                // button.GetComponent<Button>().onClick.AddListener(() => OnSelectObject(button.gameObject));
+            }
+            NextObjectSelect(i);
+            AfterPay += _goodList[i].ClearGoods;
+
         }
 
-        AfterPay += _goodList.ClearGoods;
     }
 
-    private void OnSelectObject(GameObject button)
+    private void Update()
     {
-        if(SelectedObject != null) 
-            SelectedObject.transform.GetChild(0).gameObject.SetActive(false);
+        foreach (int index in KeyboardAndJostickController.SelectNextGoodOnMonitor())
+            NextObjectSelect(index);
+        //if (KeyboardAndJostickController.SelectNextGoodOnMonitor().isPressed)
+        //{
+        //    NextObjectSelect(KeyboardAndJostickController.SelectNextGoodOnMonitor().index);
+        //}
 
-        SelectedObject = button.transform.parent.gameObject;
-        SelectedObject.transform.GetChild(0).gameObject.SetActive(true);
+        if (KeyboardAndJostickController.SelectGoodOnMonitor().isPressed)
+        {
+            _buttonAccept[KeyboardAndJostickController.SelectGoodOnMonitor().index].onClick.Invoke();
+        }
+        if (KeyboardAndJostickController.ConfirmPayment().isPressed)
+        {
+            _buttonPay[KeyboardAndJostickController.ConfirmPayment().index].onClick.Invoke();
+        }
+    }
+
+    private void NextObjectSelect(int index)
+    {
+        _indexForIterator[index]++;
+        if (_indexForIterator[index] >= _objectsWillBeIterrated[index].Count)
+        {
+            _indexForIterator[index] = 0;
+        }
+        OnSelectObject(_objectsWillBeIterrated[index][_indexForIterator[index]], index);    
 
     }
 
-    public void OnApply()
+    private void OnSelectObject(GameObject button, int index)
     {
-        if (SelectedObject == null)
+        if (_selectedObject[index] != null)
+        {
+            _selectedObject[index].transform.GetChild(0).gameObject.SetActive(false);
+        }
+        _selectedObject[index] = button.transform.gameObject;
+        _selectedObject[index].transform.GetChild(0).gameObject.SetActive(true);
+    }
+
+    public void OnApply(int index)
+    {
+        if (_selectedObject[index] == null)
             return;
 
-        SelectedObject.transform.GetChild(0).gameObject.SetActive(false);
-        _goodList.AddGood(SelectedObject.GetComponentInChildren<GoodInfo>());
-        SelectedObject = null;
+        //_selectedObject.transform.GetChild(0).gameObject.SetActive(false);
+        _goodList[index].AddGood(_selectedObject[index].GetComponentInChildren<GoodInfo>());
+       // _selectedObject = null;
     }
 
-    public void OnPay()
+    public void OnPay(int index)
     {
-       
-        StartCoroutine(OnPayCoolDown());
+        Debug.Log("w");
+        StartCoroutine(OnPayCoolDown(index));
     }
 
-    private IEnumerator OnPayCoolDown()
+    private IEnumerator OnPayCoolDown(int index)
     {
-        AfterPay();
-        buttonPay.interactable = false;
+        Debug.Log("w2");
+        AfterPay(index);
+        _buttonPay[index].interactable = false;
         yield return new WaitForSeconds(cooldown);
-        buttonPay.interactable = true;
+        _buttonPay[index].interactable = true;
 
     }
 }
