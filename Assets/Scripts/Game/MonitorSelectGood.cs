@@ -74,19 +74,12 @@ public class MonitorSelectGood : MonoBehaviour
     {
         foreach (int index in KeyboardAndJostickController.SelectNextGoodOnMonitor())
             NextObjectSelect(index);
-        //if (KeyboardAndJostickController.SelectNextGoodOnMonitor().isPressed)
-        //{
-        //    NextObjectSelect(KeyboardAndJostickController.SelectNextGoodOnMonitor().index);
-        //}
 
-        if (KeyboardAndJostickController.SelectGoodOnMonitor().isPressed)
-        {
-            _buttonAccept[KeyboardAndJostickController.SelectGoodOnMonitor().index].onClick.Invoke();
-        }
-        if (KeyboardAndJostickController.ConfirmPayment().isPressed)
-        {
-            _buttonPay[KeyboardAndJostickController.ConfirmPayment().index].onClick.Invoke();
-        }
+        foreach (int index in KeyboardAndJostickController.ConfirmPayment())
+            _buttonPay[index].onClick.Invoke();
+
+        foreach (int index in KeyboardAndJostickController.SelectGoodOnMonitor())
+            _buttonAccept[index].onClick.Invoke();
     }
 
     private void NextObjectSelect(int index)

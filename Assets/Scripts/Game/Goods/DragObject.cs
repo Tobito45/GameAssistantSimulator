@@ -82,8 +82,14 @@ public class DragObject : MonoBehaviour
             GetComponent<MeshRenderer>().material = _basicMaterial;
         }
 
-        if (_isDragging && KeyboardAndJostickController.LetsGoGood().isPressed)
-            LetGoItem();
+        foreach (int index in KeyboardAndJostickController.LetsGoGood())
+        {
+            if(index == Index && _isDragging)
+            {
+                LetGoItem();
+
+            }
+        }
 
         if (_isDragging)
         {

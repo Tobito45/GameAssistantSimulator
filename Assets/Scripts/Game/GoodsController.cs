@@ -30,28 +30,31 @@ public class GoodsController : MonoBehaviour
 
     private void Update()
     {
-        if (KeyboardAndJostickController.MoveGoodsConveyor().isPressed)
+
+        foreach (int index in KeyboardAndJostickController.MoveGoodsConveyor())
         {
-            foreach (GameObject good in _goodsOnConveer[KeyboardAndJostickController.MoveGoodsConveyor().index])//[0])
+            foreach (GameObject good in _goodsOnConveer[index])//[0])
             {
                 good.transform.position += new Vector3(moveObjects * Time.deltaTime, 0, 0);
             }
         }
 
-        if(KeyboardAndJostickController.ChangeGoods().isPressed)
+
+        foreach (int index in KeyboardAndJostickController.ChangeGoods())
+            IndexSelectedItemPlus(index);
+
+        foreach (int index in KeyboardAndJostickController.TakeGood())
         {
-            IndexSelectedItemPlus(KeyboardAndJostickController.ChangeGoods().index);
+            if (_indexSelected[index] != -1)
+            {
+                _goodSelected[index] = _goodsCanBeSelected[index][_indexSelected[index]];
+                _goodSelected[index].TakeItem();
+            }
         }
 
-        var resultTakeGood = KeyboardAndJostickController.TakeGood();
-        if (resultTakeGood.isPressed && _indexSelected[resultTakeGood.index] != -1)
-        {
-            _goodSelected[resultTakeGood.index] =_goodsCanBeSelected[resultTakeGood.index][_indexSelected[resultTakeGood.index]];
-            _goodSelected[resultTakeGood.index].TakeItem();
-        }
-        
-        if (KeyboardAndJostickController.LetsGoGood().isPressed)
-            _goodSelected[KeyboardAndJostickController.LetsGoGood().index] = null; 
+        foreach (int index in KeyboardAndJostickController.LetsGoGood())
+            _goodSelected[index] = null;
+
     }
 
 

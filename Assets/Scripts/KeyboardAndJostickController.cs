@@ -15,18 +15,7 @@ public class KeyboardAndJostickController : MonoBehaviour
 
     public void Update()
     {
-        //if (Gamepad.current.rightTrigger.isPressed)
-        //  Debug.Log(Gamepad.current.displayName + " " + Gamepad.current.deviceId + " " + Gamepad.current.);
 
-      /*  Gamepad[] gamepads = Gamepad.all.ToArray();
-
-        for (int i = 0; i < gamepads.Length; i++)
-        {
-            if (gamepads[i].rightTrigger.isPressed)
-            {
-                Debug.Log(i);
-            }
-        }*/
     }
 
 
@@ -62,8 +51,6 @@ public class KeyboardAndJostickController : MonoBehaviour
             {
                 if (i == index)
                 {
-                    //horizontalInput = -Input.GetAxis("Horizontal");
-                    //verticalInput = Input.GetAxis("Vertical");
                     horizontalInput = -Gamepad.all[i].leftStick.ReadValue().x;
                     verticalInput = Gamepad.all[i].leftStick.ReadValue().y;
                 }
@@ -105,28 +92,27 @@ public class KeyboardAndJostickController : MonoBehaviour
         return (horizontalInput, verticalInput);
     }
 
-    public static (bool isPressed, int index) MoveGoodsConveyor()
+    public static IEnumerable<int> MoveGoodsConveyor()
     {
         if (!IsJosticConnected)
-            return (Input.GetKey(KeyCode.Space), 0);
+            return Input.GetKeyDown(KeyCode.Space) ? new List<int> { 0 } : new List<int>();
         else
         {
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (Gamepad.all[i].rightTrigger.isPressed)
-                {
-                    return (true,  i); 
-                }
-            }
-            return (false, 0);
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.rightTrigger.isPressed)
+                   .Select(x => x.index)
+                   .ToList();
+
+            return list;
         }
-            //return Gamepad.current.rightTrigger.isPressed;
     }
 
     public static IEnumerable<int> SelectNextGoodOnMonitor()
     {
         if (!IsJosticConnected)
-            return new List<int> { 0 }; //new List<( int index)> { (Input.GetKeyDown(KeyCode.H), 0) };
+            return Input.GetKeyDown(KeyCode.H) ? new List<int> { 0 } : new List<int>();
         else
         {
             var list = new List<int>();
@@ -137,104 +123,91 @@ public class KeyboardAndJostickController : MonoBehaviour
                    .ToList();
 
             return list;
-            /*) =). g.xButton.wasPressedThisFrame).Select(g => g.de)
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (Gamepad.all[i].xButton.wasPressedThisFrame)
-                {
-                    //return (true, i);
-                    list.Add((true, i));
-                }
-            }
-            return new List<int>(); //(false, 0);
-        */
         }
     }
-    public static (bool isPressed, int index) ConfirmPayment()
+    public static IEnumerable<int> ConfirmPayment()
     {
         if (!IsJosticConnected)
-            return (Input.GetKeyDown(KeyCode.N),0);
+            return Input.GetKeyDown(KeyCode.N) ? new List<int> { 0 } : new List<int>();
         else
         {
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (Gamepad.all[i].startButton.wasPressedThisFrame)
-                {
-                    return (true, i);
-                }
-            }
-            return (false, 0);
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.startButton.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+
+            return list;
         }
-        //return Gamepad.current.startButton.wasPressedThisFrame;
     } 
     
-    public static (bool isPressed, int index) SelectGoodOnMonitor()
+    public static IEnumerable<int> SelectGoodOnMonitor()
     {
         if (!IsJosticConnected)
-            return (Input.GetKeyDown(KeyCode.J), 0);
+            return Input.GetKeyDown(KeyCode.J) ? new List<int> { 0 } : new List<int>();
         else
         {
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (Gamepad.all[i].yButton.wasPressedThisFrame)
-                {
-                    return (true, i);
-                }
-            }
-            return (false, 0);
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.yButton.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+            return list;
         }
-        //return Gamepad.current.yButton.wasPressedThisFrame;
     }
 
-    public static (bool isPressed, int index) ChangeGoods()
+    public static IEnumerable<int> ChangeGoods()
     {
         if (!IsJosticConnected)
-            return (Input.GetKeyDown(KeyCode.Tab), 0);
+            return Input.GetKeyDown(KeyCode.Tab) ? new List<int> { 0 } : new List<int>();
         else
         {
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (Gamepad.all[i].leftTrigger.wasPressedThisFrame)
-                {
-                    return (true, i);
-                }
-            }
-            return (false, 0);
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.leftTrigger.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+            return list;
         }
+
     } 
     
-    public static (bool isPressed, int index) TakeGood()
+    public static IEnumerable<int> TakeGood()
     {
         if (!IsJosticConnected)
-            return (Input.GetKeyDown(KeyCode.L),0);
+            return Input.GetKeyDown(KeyCode.L) ? new List<int> { 0 } : new List<int>();
         else
         {
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (Gamepad.all[i].aButton.wasPressedThisFrame)
-                {
-                    return (true, i);
-                }
-            }
-            return (false, 0);
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.aButton.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+            return list;
         }
+
+       
     }
     
-    public static (bool isPressed, int index) LetsGoGood()
+    public static IEnumerable<int> LetsGoGood()
     {
         if (!IsJosticConnected)
-            return (Input.GetKeyDown(KeyCode.K), 0);
+            return Input.GetKeyDown(KeyCode.K) ? new List<int> { 0 } : new List<int>();
         else
         {
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (Gamepad.all[i].bButton.wasPressedThisFrame)
-                {
-                    return (true, i);
-                }
-            }
-            return (false, 0);
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.bButton.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+            return list;
         }
+      
     }
 
     /*  [SerializeField]
