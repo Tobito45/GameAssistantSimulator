@@ -30,13 +30,17 @@ public class GameController : MonoBehaviour
     public bool IsTimerEnded() => _timer < 0;
 
     public float MaxTime => _maxTime;
-    public float AllSum => _allSum;
+    public float AllSum(int index) => _allSum[index];
 
     private List<GoodInfo>[] _basicGoodsName; //= new List<GoodInfo>();
-    private float _sum = 0, _plusSum = 0, _minusSum = 0, _allSum;
-    private int _all = 0, _allCorect = 0;
+    private float[] _sum = new float[KeyboardAndJostickController.MAXPLAYERS], 
+        _plusSum = new float[KeyboardAndJostickController.MAXPLAYERS], 
+        _minusSum = new float[KeyboardAndJostickController.MAXPLAYERS], 
+        _allSum = new float[KeyboardAndJostickController.MAXPLAYERS];
+    private int[] _all = new int[KeyboardAndJostickController.MAXPLAYERS], 
+        _allCorect = new int[KeyboardAndJostickController.MAXPLAYERS];
 
-    private int[] _countClients;
+    private int[] _countClients ;
 
     public QCodeDetecter QCodeDetecter => _qCodeDetecter;
     public SplitController SplitController => _splitController;
@@ -45,6 +49,8 @@ public class GameController : MonoBehaviour
 
     private static GameController _instance;
     public static GameController Instance => _instance;
+
+    public bool[] IsOpenedPanelUI { get; set; }
 
     public GoodInfo this[string name, int index = 0] //TODO
     {
@@ -77,102 +83,101 @@ public class GameController : MonoBehaviour
     {
         OnStartNewGame += DeleteAllGoodsOnScene;
         OnStartNewGame += SetBasicInfo;
-        OnStartNewGame += NextGenerete;
-     
-        _clientGenerator.OnClientDestroy += NextGenerete;
+
+        IsOpenedPanelUI = new bool[KeyboardAndJostickController.MAXPLAYERS];
     }
 
     public void StartOfTheGame(float maxTime = 60f)
     {
-        this._maxTime = maxTime; 
+        this._maxTime = maxTime;
         OnStartNewGame();
+        for (int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++)
+        {
+            NextGenerete(i);
+        }
     }
 
-    private void NextGenerete()
+    public void NextGenerete(int index)
     {
-        for(int i = 0; i < _countClients.Length; i++)
-        {
-            if (_countClients[i] != 0)
-                EndClient();
-        }
+        if (_countClients[index] != 0)
+                EndClient(index);
         //if (_countClient != 0)
         //    EndClient();
 
         if (IsTimerEnded())
         {
-            EndGame();
+            EndGame(index);
             return;
         }
 
 
 
-        //_countClient++;
-        for (int i = 0; i < _countClients.Length; i++)
-            _countClients[i] ++;
+        _countClients[index]++;
 
-        _basicGoodsName = new List<GoodInfo>[KeyboardAndJostickController.GetCountGamepads()];
-        for(int i = 0; i < _countClients.Length; i++)
+        _basicGoodsName[index] = new List<GoodInfo>();
+
+
+        _sum[index] = 0;
+        _plusSum[index] = 0;
+        _minusSum[index] = 0;
+        _allCorect[index] = 0;
+
+        for (int i = UnityEngine.Random.Range(3, 7); i < 8; i++)
         {
-            _basicGoodsName[i] = new List<GoodInfo>();
+            GoodInfo good = _goodsController.AddNewItem(index).GetComponentInChildren<GoodInfo>();
+            _basicGoodsName[index].Add(good);
+            _sum[index] += good.Price;
         }
+        _all[index] = _basicGoodsName[index].Count;
 
-
-        _sum = 0;
-        _plusSum = 0;
-        _minusSum = 0;
-        _allCorect = 0;
-
-        for (int j = 0; j < _countClients.Length; j++)
-        {
-            for (int i = UnityEngine.Random.Range(3, 7); i < 8; i++)
-            {
-                GoodInfo good = _goodsController.AddNewItem(j).GetComponentInChildren<GoodInfo>();
-                _basicGoodsName[j].Add(good);
-                _sum += good.Price;
-            }
-        }
-        _all = _basicGoodsName[0].Count; //TODO
-
-        for (int i = 0; i < _countClients.Length; i++)
-        {
-            _clientGenerator.SpawnClient(i);
-        }
+        _clientGenerator.SpawnClient(index);
+        
     }
 
-    public void UpdateTimer(TextMeshProUGUI text)
+    private void Update()
+    {
+        _timer -= Time.deltaTime;
+    }
+
+    public void SetTextTimer(TextMeshProUGUI text, int index)
     {
         if (IsTimerEnded())
         {
+            if (_countClients != null && _countClients.Count() > 0 && _countClients[index] == 0)
+            {
+                text.text = $"Time is left! Waiting for other players";
+                return;
+            }
+
             text.text = $"Time is left! This is your last client";
             return;
         }
-
-        _timer -= Time.deltaTime;
         text.text = $"Time left: {_timer.ToString("F2")}";
+
     }
 
-    public void OnAddGood(GoodInfo good, int index = 0) //TODO
+    public void OnAddGood(GoodInfo good, int index) 
     {
         if (_basicGoodsName[index].Remove(this[good.GoodName]) == true)
         {
-            _allCorect++;
-            _plusSum += good.Price;
+            _allCorect[index]++;
+            _plusSum[index] += good.Price;
         } else
         {
-            _minusSum += good.Price;
+            _minusSum[index] += good.Price;
         }
     }
 
-    private void EndClient(int index = 0) //TODO
+    private void EndClient(int index)
     {
-        foreach(GoodInfo good in _basicGoodsName[0])
+        foreach (GoodInfo good in _basicGoodsName[index])
         {
-            _minusSum += good.Price;
+            _minusSum[index] += good.Price;
         }
 
-        _allSum += _plusSum - _minusSum;
-        _endMenuController.AddElementToEnd(clientNumber: _countClients[0], countGoods: _all, correctGoods: _allCorect,
-                                                    minusMoney: _minusSum, plusMoney: _plusSum, allSum: _sum); //TODO!
+        _allSum[index] += _plusSum[index] - _minusSum[index];
+        _endMenuController.AddElementToEnd(clientNumber: _countClients[index], countGoods: _all[index], correctGoods: _allCorect[index],
+                                                    minusMoney: _minusSum[index], plusMoney: _plusSum[index], allSum: _sum[index], index: index); 
     }
 
     private void DeleteAllGoodsOnScene()
@@ -187,14 +192,19 @@ public class GameController : MonoBehaviour
     }
     private void SetBasicInfo()
     {
-        _allSum = 0;
+
+        for(int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
+            _allSum[i] = 0; 
+
         _timer = _maxTime;
         _countClients = new int[KeyboardAndJostickController.GetCountGamepads()];
+        _basicGoodsName = new List<GoodInfo>[KeyboardAndJostickController.GetCountGamepads()];
+
     }
 
-    private void EndGame()
+    private void EndGame(int index)
     {
-        _endMenuController.AktualText(_allSum);
-        _endMenuController.ActivePanel();
+        _endMenuController.AktualText(_allSum[index], index);
+        _endMenuController.ActivePanel(index);
     }
 }

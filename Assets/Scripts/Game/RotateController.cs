@@ -21,9 +21,9 @@ public class RotateController : MonoBehaviour
     {
         for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
-            if (DragObject(i) == null)
+            if (DragObject(i) == null || GameController.Instance.IsOpenedPanelUI[i])
             {
-                return;
+                continue;
             }
 
             float horizontalInput = 0;//Input.GetAxis("Horizontal");
@@ -36,10 +36,8 @@ public class RotateController : MonoBehaviour
 
             if (ObjectRotate[i] != null)
             {
-                // ѕримен€ем поворот вокруг вертикальной оси (Y) по горизонтальному вводу (A/D)
                 ObjectRotate[i].transform.Rotate(0f, horizontalInput * rotationAmount, 0f, Space.World);
-
-                // ѕримен€ем поворот вокруг горизонтальной оси (X) по вертикальному вводу (W/S)
+                
                 ObjectRotate[i].transform.Rotate(verticalInput * rotationAmount, 0f, 0f, Space.World);
             }
         }

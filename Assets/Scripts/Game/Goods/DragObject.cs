@@ -15,6 +15,8 @@ public class DragObject : MonoBehaviour
     private RotateController _rotateController;
     private Rigidbody _rigidbody;
     private Material _basicMaterial;
+    private Outline _outline;
+
     [SerializeField]
     private Material _detectedMaterial, _selectedMaterial;
     private GoodInfo _good;
@@ -25,7 +27,7 @@ public class DragObject : MonoBehaviour
     public event ContainerDelegete OnExitContainer;
     public event ContainerDelegete OnEnterContainer;
     public event Action<DragObject, int> OnLetGoGood;
-   
+
     public GameObject GetQCodeObject => _qCodeObject;
     public int Index { get; set; }
 
@@ -35,13 +37,21 @@ public class DragObject : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _good = GetComponent<GoodInfo>();
         _basicMaterial = GetComponent<MeshRenderer>().material;
+
+
+        _outline = gameObject.AddComponent<Outline>();
+        _outline.enabled = false;
+        _outline.OutlineMode = Outline.Mode.OutlineVisible;
+        _outline.OutlineWidth = 7;
+
+
     }
 
     private void OnMouseDown()
     {
         if (Input.GetMouseButton(0))
         {
-           //TakeItem();
+            //TakeItem();
         }
     }
 
@@ -61,10 +71,18 @@ public class DragObject : MonoBehaviour
 
     public void CanBeSelected(bool canBeSelected)
     {
-        if(canBeSelected)
-            GetComponent<MeshRenderer>().material = _selectedMaterial;
+        if (canBeSelected)
+        {
+            //GetComponent<MeshRenderer>().material = _selectedMaterial;
+            _outline.OutlineColor = Color.green;
+        }
         else
-            GetComponent<MeshRenderer>().material = _detectedMaterial;
+        {
+            //GetComponent<MeshRenderer>().material = _detectedMaterial;
+            _outline.OutlineColor = Color.yellow;
+        }
+        _outline.enabled = true;
+
     }
     public void LetGoItem()
     {
@@ -76,26 +94,31 @@ public class DragObject : MonoBehaviour
 
     private void Update()
     {
-        if (transform.position.y < BOARDERTOLETGOGOOD && GetComponent<MeshRenderer>().material != _basicMaterial)
+        if (transform.position.y < BOARDERTOLETGOGOOD && _outline.enabled)//GetComponent<MeshRenderer>().material != _basicMaterial)
         {
             OnLetGoGood(this, Index);
-            GetComponent<MeshRenderer>().material = _basicMaterial;
+            // GetComponent<MeshRenderer>().material = _basicMaterial;
+            _outline.enabled = false;
         }
 
-        foreach (int index in KeyboardAndJostickController.LetsGoGood())
-        {
-            if(index == Index && _isDragging)
-            {
-                LetGoItem();
 
+        if (!GameController.Instance.IsOpenedPanelUI[Index])
+        {
+            foreach (int index in KeyboardAndJostickController.LetsGoGood())
+            {
+                if (index == Index && _isDragging)
+                {
+                    LetGoItem();
+
+                }
             }
         }
 
-        if (_isDragging)
+        if (_isDragging && !GameController.Instance.IsOpenedPanelUI[Index])
         {
             (float horizontal, float vertical) input = KeyboardAndJostickController.GetMovement(Index);
 
-            transform.position += new Vector3(input.horizontal , input.vertical , 0) * SPEED * Time.deltaTime;
+            transform.position += new Vector3(input.horizontal, input.vertical, 0) * SPEED * Time.deltaTime;
             if (_qCodeObject != null && _good.IsScaned == false)
             {
                 Vector3 rayOrigin = _qCodeObject.transform.position;
@@ -117,9 +140,10 @@ public class DragObject : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Container")
+        if (collision.gameObject.tag == "Container")
         {
-            GetComponent<MeshRenderer>().material = _basicMaterial;
+            //GetComponent<MeshRenderer>().material = _basicMaterial;
+            _outline.enabled = false;
             Match match = Regex.Match(collision.gameObject.name, @"\d+");
             OnEnterContainer(this.gameObject, int.Parse(match.Value) - 1);
         }
@@ -129,7 +153,9 @@ public class DragObject : MonoBehaviour
     {
         if (collision.gameObject.tag == "Container")
         {
-            GetComponent<MeshRenderer>().material = _detectedMaterial;
+            //GetComponent<MeshRenderer>().material = _detectedMaterial;
+            _outline.enabled = true;
+            _outline.OutlineColor = Color.yellow;
             Match match = Regex.Match(collision.gameObject.name, @"\d+");
             OnExitContainer(this.gameObject, int.Parse(match.Value) - 1);
         }

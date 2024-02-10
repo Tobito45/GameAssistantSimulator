@@ -95,7 +95,7 @@ public class ClientGenerator : MonoBehaviour
         Destroy(client);
         yield return new WaitForSeconds(timeBetween);
         StopAllCoroutinesExceptCurrent();
-        OnClientDestroy();
+        GameController.Instance.NextGenerete(index);
         StopCoroutine(lastCoroutine);
     }
 
@@ -168,7 +168,6 @@ public class ClientGenerator : MonoBehaviour
 
     public void ClientPayed(int index)
     {
-        Debug.Log("w3");
         if (_aktualClient[index] != null)
             lastCoroutine = StartCoroutine(MoveToOutSide(_aktualClient[index], index));
     }

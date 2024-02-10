@@ -9,6 +9,8 @@ public class MonitorGoodList : MonoBehaviour
 
 
     [SerializeField]
+    private int index;
+    [SerializeField]
     private Image _panelPrefab;
 
     [SerializeField]
@@ -45,7 +47,7 @@ public class MonitorGoodList : MonoBehaviour
         _sum += good.Price;
         _textSum.text = _sum.ToString();
 
-        GameController.Instance.OnAddGood(good);
+        GameController.Instance.OnAddGood(good, index);
     }
 
     public void ClearGoods(int i)

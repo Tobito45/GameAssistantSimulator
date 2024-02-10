@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,17 +25,23 @@ public class MonitorSelectGood : MonoBehaviour
     [SerializeField]
     private MonitorGoodList[] _goodList;
 
+    [SerializeField]
+    private GameObject[] _monitorSelecter, _yPanel, _selecterCanvas;
+    private float[] timer = new float[KeyboardAndJostickController.MAXPLAYERS];
+
     [Header("UI")]
     [SerializeField]
     private Button[] _buttonPay, _buttonAccept;
 
+    [SerializeField]
+    private MainController _mainController;
 
     private GameObject[] _selectedObject = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
 
     private List<GameObject>[] _objectsWillBeIterrated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _indexForIterator = new int[KeyboardAndJostickController.MAXPLAYERS];
 
-    public  Action<int> AfterPay;
+    public Action<int> AfterPay;
 
     private void Start()
     {
@@ -43,11 +49,11 @@ public class MonitorSelectGood : MonoBehaviour
         string jsonFile = json.ToString();
         SelectedDataJson[] dataObject = JsonConvert.DeserializeObject<SelectedDataJson[]>(jsonFile);
 
-        for (int i = 0; i < _goodsInScrollContent.Length;i++)
+        for (int i = 0; i < _goodsInScrollContent.Length; i++)
         {
             _indexForIterator[i] = -1;
             _objectsWillBeIterrated[i] = new List<GameObject>();
-         
+
             foreach (var item in dataObject)
             {
                 var obj = Instantiate(_goodPrefab, _goodsInScrollContent[i]);
@@ -61,35 +67,137 @@ public class MonitorSelectGood : MonoBehaviour
                 comp.SetSelectInfo(item.Price, item.Name);
                 _objectsWillBeIterrated[i].Add(obj.gameObject);
 
-                // button.GetComponent<Button>().onClick.AddListener(() => OnSelectObject(button.gameObject));
+                 button.GetComponent<Button>().onClick.AddListener(() => OnSelectObject(obj.gameObject, i));
             }
             NextObjectSelect(i);
             AfterPay += _goodList[i].ClearGoods;
 
         }
 
+        MainController.ForeachAllObjects(_monitorSelecter, (g) => g.SetActive(false));//!KeyboardAndJostickController.IsJosticConnected));
+        MainController.ForeachAllObjects(_yPanel, (g) => g.SetActive(true));//KeyboardAndJostickController.IsJosticConnected));
+
     }
 
     private void Update()
     {
         foreach (int index in KeyboardAndJostickController.SelectNextGoodOnMonitor())
+        {
+            if (!GameController.Instance.IsOpenedPanelUI[index])
+                continue;
+
             NextObjectSelect(index);
+        }
+
 
         foreach (int index in KeyboardAndJostickController.ConfirmPayment())
-            _buttonPay[index].onClick.Invoke();
+        {
+            if (!GameController.Instance.IsOpenedPanelUI[index])
+                continue;
 
-        foreach (int index in KeyboardAndJostickController.SelectGoodOnMonitor())
-            _buttonAccept[index].onClick.Invoke();
+            _buttonPay[index].onClick.Invoke();
+        }
+
+        DetectUIChanges();
+
+        // foreach (int index in KeyboardAndJostickController.SelectGoodOnMonitor())
+        //   _buttonAccept[index].onClick.Invoke();
     }
 
-    private void NextObjectSelect(int index)
+    private void DetectUIChanges()
     {
-        _indexForIterator[index]++;
-        if (_indexForIterator[index] >= _objectsWillBeIterrated[index].Count)
+        if (KeyboardAndJostickController.IsJosticConnected)
         {
-            _indexForIterator[index] = 0;
+            if(!_mainController.IsMenu)
+                foreach (int index in KeyboardAndJostickController.SelectGoodOnMonitor())
+                    ActiveOrDisableCanvasSelect(index);
+
+
+            foreach (int index in KeyboardAndJostickController.GetAButton())
+            {
+                if (!GameController.Instance.IsOpenedPanelUI[index])
+                    continue;
+
+                _buttonAccept[index].onClick.Invoke();
+            }
+
+            //if (KeyboardAndJostickController.GetAButton())
+            //  _buttonAccept[0].onClick.Invoke();
+
+            foreach (int index in KeyboardAndJostickController.GetBButton())
+            {
+                if (!GameController.Instance.IsOpenedPanelUI[index])
+                    continue;
+
+                _buttonPay[index].onClick.Invoke();
+            }
+
+            //if (KeyboardAndJostickController.GetBButton())
+            //    _buttonPay[0].onClick.Invoke();
+
+
+            for (int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++)
+            {
+                if (!GameController.Instance.IsOpenedPanelUI[i])
+                    continue;
+
+                if (timer[i] < 0)
+                {
+                    var movement = KeyboardAndJostickController.GetMovement(i);
+
+                    if (movement.horizontal > 0.25f)
+                    {
+                        NextObjectSelect(i, -1);
+                        Debug.Log("Rogh");
+                    }
+                    else if (movement.horizontal < -0.25f)
+                    {
+                        NextObjectSelect(i, 1);
+                        Debug.Log("Left");
+                    }
+                    else if (movement.vertical > 0.25f)
+                    {
+                        NextObjectSelect(i, -_objectsWillBeIterrated[i].Count / 2);
+                        Debug.Log("up");
+
+                    }
+                    else if (movement.vertical < -0.25f)
+                    {
+                        NextObjectSelect(i, _objectsWillBeIterrated[i].Count / 2);
+                        Debug.Log("down");
+                    }
+                    timer[i] = 0.05f;
+                }
+                else
+                {
+                    timer[i] -= Time.deltaTime;
+                }
+            }
         }
-        OnSelectObject(_objectsWillBeIterrated[index][_indexForIterator[index]], index);    
+    }
+
+
+
+    private void ActiveOrDisableCanvasSelect(int index)
+    {
+        GameController.Instance.IsOpenedPanelUI[index] = !_selecterCanvas[index].activeInHierarchy;
+        _yPanel[index].SetActive(_selecterCanvas[index].activeInHierarchy && KeyboardAndJostickController.IsJosticConnected);
+        _selecterCanvas[index].SetActive(!_selecterCanvas[index].activeInHierarchy);
+
+    }
+
+    private void NextObjectSelect(int index, int countAdd = 1)
+    {
+        _indexForIterator[index] += countAdd;
+        /* if (_indexForIterator[index] >= _objectsWillBeIterrated[index].Count)
+         {
+             _indexForIterator[index] = 0;
+         }*/
+        if (_indexForIterator[index] >= _objectsWillBeIterrated[index].Count || _indexForIterator[index] < 0)
+        {
+            _indexForIterator[index] -= countAdd;
+        }
+        OnSelectObject(_objectsWillBeIterrated[index][_indexForIterator[index]], index);
 
     }
 
@@ -110,20 +218,26 @@ public class MonitorSelectGood : MonoBehaviour
 
         //_selectedObject.transform.GetChild(0).gameObject.SetActive(false);
         _goodList[index].AddGood(_selectedObject[index].GetComponentInChildren<GoodInfo>());
-       // _selectedObject = null;
+        // _selectedObject = null;
     }
 
     public void OnPay(int index)
     {
-        Debug.Log("w");
         StartCoroutine(OnPayCoolDown(index));
     }
 
     private IEnumerator OnPayCoolDown(int index)
     {
-        Debug.Log("w2");
         AfterPay(index);
         _buttonPay[index].interactable = false;
+        _selecterCanvas[index].SetActive(false);
+
+        if (KeyboardAndJostickController.IsJosticConnected)
+        {
+            _yPanel[index].SetActive(true);
+            GameController.Instance.IsOpenedPanelUI[index] = false;
+        }
+        
         yield return new WaitForSeconds(cooldown);
         _buttonPay[index].interactable = true;
 

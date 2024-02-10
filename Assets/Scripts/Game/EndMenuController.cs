@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,15 +12,15 @@ public class EndMenuController : MonoBehaviour
     
     [Header("GameObjects")]
     [SerializeField]
-    private GameObject _panelEnd;
+    private GameObject[] _panelEnd;
     [SerializeField]
-    private GameObject _scrollContent;
+    private GameObject[] _scrollContent;
     [SerializeField]
     private GameObject _panelEndInfoPrefab;
 
     [Header("Texts")]
     [SerializeField]
-    private TextMeshProUGUI _textScope;
+    private TextMeshProUGUI[] _textScope;
 
 
     [Header("Scripts")]
@@ -28,36 +29,42 @@ public class EndMenuController : MonoBehaviour
 
     private void Start()
     {
-        _panelEnd.SetActive(false);
+        MainController.ForeachAllObjects(_panelEnd, (obj) => obj.SetActive(false));
         GameController.Instance.OnStartNewGame += ClearScroll;
     }
 
-    public void AddElementToEnd(int clientNumber, int countGoods, int correctGoods, float minusMoney, float plusMoney, float allSum)
+    public void AddElementToEnd(int clientNumber, int countGoods, int correctGoods, float minusMoney, float plusMoney, float allSum, int index)
     {
-        var obj = Instantiate(_panelEndInfoPrefab, _scrollContent.transform);
-        obj.transform.Find("ClientName").GetComponent<TextMeshProUGUI>().text = $"{clientNumber} - Client";
-        obj.transform.Find("GoodsNumbers").GetComponent<TextMeshProUGUI>().text = $"{correctGoods}/{countGoods}";
-        obj.transform.Find("GoodMinusPrice").GetComponent<TextMeshProUGUI>().text = $"-{minusMoney}";
-        obj.transform.Find("GoodPlusPrice").GetComponent<TextMeshProUGUI>().text = $"+{plusMoney}";
-        obj.transform.Find("PriceTogether").GetComponent<TextMeshProUGUI>().text = $"{(plusMoney - minusMoney).ToString("F2")} ({allSum})";
+        var obj = Instantiate(_panelEndInfoPrefab, _scrollContent[index].transform);
+        obj.transform.Find("ClientName").GetComponent<TextMeshProUGUI>().text = $"{clientNumber:F2} - Client";
+        obj.transform.Find("GoodsNumbers").GetComponent<TextMeshProUGUI>().text = $"{correctGoods:F2}/{countGoods:F2}";
+        obj.transform.Find("GoodMinusPrice").GetComponent<TextMeshProUGUI>().text = $"-{minusMoney:F2}";
+        obj.transform.Find("GoodPlusPrice").GetComponent<TextMeshProUGUI>().text = $"+{plusMoney:F2}";
+        obj.transform.Find("PriceTogether").GetComponent<TextMeshProUGUI>().text = $"{(plusMoney - minusMoney).ToString("F2")} ({allSum:F2})";
 
     }
 
     public void ClearScroll()
     {
-        foreach(Transform obj in _scrollContent.transform)
-        {
-            Destroy(obj.gameObject);
+        foreach (GameObject scroll in _scrollContent) {
+            foreach (Transform obj in scroll.transform)
+            {
+                Destroy(obj.gameObject);
+            }
         }
     }
 
-    public void ActivePanel() => _panelEnd.SetActive(true);
+    public void ActivePanel(int index)
+    {
+        _panelEnd[index].SetActive(true);
+        _mainController.ActivateMenuControllingJostic();
+    }
 
-    public void AktualText(float sum) => _textScope.text = $"Your scope: {sum.ToString("F2")}"; 
+    public void AktualText(float sum, int index) => _textScope[index].text = $"Your scope: {sum.ToString("F2")}"; 
 
     public void ClosePanelEnd()
     {
-        _panelEnd.SetActive(false);
+        MainController.ForeachAllObjects(_panelEnd, (obj) => obj.SetActive(false));
         _mainController.OpenMenuAndCloseGame();
     }
 
@@ -71,7 +78,7 @@ public class EndMenuController : MonoBehaviour
             writer.WriteLine($"Saved game number{indexGame}:");
             writer.WriteLine($"Time was: {GameController.Instance.MaxTime} seconds");
 
-            foreach(Transform obj in _scrollContent.transform)
+            foreach(Transform obj in _scrollContent[0].transform) //TODO
             {
                 writer.WriteLine("================================================");
                 writer.WriteLine($"{obj.Find("ClientName").GetComponent<TextMeshProUGUI>().text}");
@@ -83,7 +90,7 @@ public class EndMenuController : MonoBehaviour
                 writer.WriteLine($"How much we get: {obj.Find("PriceTogether").GetComponent<TextMeshProUGUI>().text.Split(" ").First()}");
 
             }
-            writer.WriteLine($"\nYour scope is: {GameController.Instance.AllSum}");
+            writer.WriteLine($"\nYour scope is: {GameController.Instance.AllSum(0)}"); //TODO
             PlayerPrefs.SetInt(keySave, ++indexGame);
 
         }

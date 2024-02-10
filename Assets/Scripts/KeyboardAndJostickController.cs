@@ -44,20 +44,54 @@ public class KeyboardAndJostickController : MonoBehaviour
                 verticalInput = 1f;
             else if (Input.GetKey(KeyCode.DownArrow))
                 verticalInput = -1f;
-        } else
-        {
 
-            for (int i = 0; i < Gamepad.all.Count; i++)
-            {
-                if (i == index)
-                {
-                    horizontalInput = -Gamepad.all[i].leftStick.ReadValue().x;
-                    verticalInput = Gamepad.all[i].leftStick.ReadValue().y;
-                }
-            }
+            return (horizontalInput, verticalInput);
+        }
+        else
+        {
+            return (-Gamepad.all[index].leftStick.ReadValue().x, Gamepad.all[index].leftStick.ReadValue().y);
+           // var list = new List<(float horizontal, float vertical)>();
+           // list = Gamepad.all
+           //        .Select((gamepad, index) => (gamepad, index))
+           //        .Select(x => (-x.gamepad.leftStick.ReadValue().x, -x.gamepad.leftStick.ReadValue().y))
+           //        .ToList();
+
+            // return list;
         }
 
-        return (horizontalInput, verticalInput);
+    }
+    public static IEnumerable<int> GetAButton()
+    {
+        if (IsJosticConnected)
+        {
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.aButton.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+
+            return list;
+            //return Gamepad.all[0].aButton.wasPressedThisFrame;
+        }
+        return null;
+    }
+    
+    public static IEnumerable<int> GetBButton()
+    {
+        if (IsJosticConnected)
+        {
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.bButton.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+
+            return list;
+            //return Gamepad.all[0].bButton.wasPressedThisFrame;
+        }
+        return null;
     }
 
     public static (float horizontal, float vertical) GetRotate(int index)
@@ -95,7 +129,7 @@ public class KeyboardAndJostickController : MonoBehaviour
     public static IEnumerable<int> MoveGoodsConveyor()
     {
         if (!IsJosticConnected)
-            return Input.GetKeyDown(KeyCode.Space) ? new List<int> { 0 } : new List<int>();
+            return Input.GetKey(KeyCode.Space) ? new List<int> { 0 } : new List<int>();
         else
         {
             var list = new List<int>();

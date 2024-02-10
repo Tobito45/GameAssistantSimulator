@@ -31,8 +31,12 @@ public class GoodsController : MonoBehaviour
     private void Update()
     {
 
+
         foreach (int index in KeyboardAndJostickController.MoveGoodsConveyor())
         {
+            if (GameController.Instance.IsOpenedPanelUI[index])
+                continue;
+
             foreach (GameObject good in _goodsOnConveer[index])//[0])
             {
                 good.transform.position += new Vector3(moveObjects * Time.deltaTime, 0, 0);
@@ -41,10 +45,17 @@ public class GoodsController : MonoBehaviour
 
 
         foreach (int index in KeyboardAndJostickController.ChangeGoods())
+        {
+            if (GameController.Instance.IsOpenedPanelUI[index])
+                continue;
             IndexSelectedItemPlus(index);
+        }
 
         foreach (int index in KeyboardAndJostickController.TakeGood())
         {
+            if (GameController.Instance.IsOpenedPanelUI[index])
+                continue;
+
             if (_indexSelected[index] != -1)
             {
                 _goodSelected[index] = _goodsCanBeSelected[index][_indexSelected[index]];
@@ -53,7 +64,12 @@ public class GoodsController : MonoBehaviour
         }
 
         foreach (int index in KeyboardAndJostickController.LetsGoGood())
+        {
+            if (GameController.Instance.IsOpenedPanelUI[index])
+                continue;
+            
             _goodSelected[index] = null;
+        }
 
     }
 
@@ -155,10 +171,8 @@ public class GoodsController : MonoBehaviour
             _goodsCanBeSelected[index][_indexSelected[index]].LetGoItem();
         }
         _indexSelected[index] = newIndex;
-        Debug.Log(index);
         if (_indexSelected[index] >= 0 && _indexSelected[index] < _goodsCanBeSelected[index].Count)
         {
-            Debug.Log("hme");
             _goodsCanBeSelected[index][_indexSelected[index]].CanBeSelected(true);
         }
 
