@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
@@ -12,11 +14,16 @@ public class EndMenuController : MonoBehaviour
     
     [Header("GameObjects")]
     [SerializeField]
-    private GameObject[] _panelEnd;
+    private GameObject[] _panelEnd, _panelInputName;
     [SerializeField]
     private GameObject[] _scrollContent;
     [SerializeField]
     private GameObject _panelEndInfoPrefab;
+
+    [SerializeField]
+    private TMP_InputField[] _inputFieldsName;
+    [SerializeField]
+    private GameObject[] _warningSymbol;
 
     [Header("Texts")]
     [SerializeField]
@@ -26,6 +33,8 @@ public class EndMenuController : MonoBehaviour
     [Header("Scripts")]
     [SerializeField]
     private MainController _mainController;
+
+    public bool IsEndPanelActive(int index) => _panelEnd[index].activeInHierarchy;
 
     private void Start()
     {
@@ -96,6 +105,23 @@ public class EndMenuController : MonoBehaviour
         }
     }
 
+    public void SaveDataInFirebase(int index)
+    {
+        if (string.IsNullOrEmpty(_inputFieldsName[index].text))
+        {
+            StartCoroutine(MainController.MakeActionAfterTime(
+                () => _warningSymbol[index].SetActive(true),
+                () => _warningSymbol[index].SetActive(false), 2));
+            return;
+        }
+
+        GameController.Instance.FirebaseController.SaveUserScore(_inputFieldsName[index].text, GameController.Instance.AllSum(index), 
+                            (int)GameController.Instance.MaxTime, DateTime.Now.ToString());
+
+        _panelInputName[index].SetActive(false);
+    }
+
+  
     public static string GetByPattern(string pattern, string input)
     {
         return Regex.Match(input, pattern).Groups[1].Value;

@@ -5,6 +5,7 @@ using UnityEngine;
 public class DragObject : MonoBehaviour
 {
     public static float BOARDERTOLETGOGOOD = -2.1f;
+    public static float BOARDERCANOTMOVE = -2.0f;
 
 
     [SerializeField]
@@ -23,6 +24,8 @@ public class DragObject : MonoBehaviour
     private bool _isDragging = false;
     private Vector3 _offset;
 
+    private bool _isActualGameIsEnd = false;
+
     public delegate void ContainerDelegete(GameObject good, int index);
     public event ContainerDelegete OnExitContainer;
     public event ContainerDelegete OnEnterContainer;
@@ -30,6 +33,7 @@ public class DragObject : MonoBehaviour
 
     public GameObject GetQCodeObject => _qCodeObject;
     public int Index { get; set; }
+
 
     private void Start()
     {
@@ -44,6 +48,7 @@ public class DragObject : MonoBehaviour
         _outline.OutlineMode = Outline.Mode.OutlineVisible;
         _outline.OutlineWidth = 7;
 
+        GameController.Instance.OnEndGame += OnEndGame;
 
     }
 
@@ -94,6 +99,9 @@ public class DragObject : MonoBehaviour
 
     private void Update()
     {
+        if (_isActualGameIsEnd)
+            return;
+
         if (transform.position.y < BOARDERTOLETGOGOOD && _outline.enabled)//GetComponent<MeshRenderer>().material != _basicMaterial)
         {
             OnLetGoGood(this, Index);
@@ -116,24 +124,32 @@ public class DragObject : MonoBehaviour
 
         if (_isDragging && !GameController.Instance.IsOpenedPanelUI[Index])
         {
-            (float horizontal, float vertical) input = KeyboardAndJostickController.GetMovement(Index);
+            MoveGood();
+        }
+    }
 
-            transform.position += new Vector3(input.horizontal, input.vertical, 0) * SPEED * Time.deltaTime;
-            if (_qCodeObject != null && _good.IsScaned == false)
+    private void MoveGood()
+    {
+        (float horizontal, float vertical) input = KeyboardAndJostickController.GetMovement(Index);
+        if (transform.position.y + input.vertical *Time.deltaTime < BOARDERCANOTMOVE)
+            input.vertical = 0;
+
+
+        transform.position += new Vector3(input.horizontal, input.vertical, 0) * SPEED * Time.deltaTime;
+        if (_qCodeObject != null && _good.IsScaned == false)
+        {
+            Vector3 rayOrigin = _qCodeObject.transform.position;
+            Vector3 rayDirection = _qCodeObject.transform.up;
+
+            Ray ray = new Ray(rayOrigin, rayDirection);
+            RaycastHit hit;
+            Debug.DrawRay(rayOrigin, rayDirection, Color.red);
+            if (Physics.Raycast(ray, out hit))
             {
-                Vector3 rayOrigin = _qCodeObject.transform.position;
-                Vector3 rayDirection = _qCodeObject.transform.up;
+                GameObject hitObject = hit.collider.gameObject;
 
-                Ray ray = new Ray(rayOrigin, rayDirection);
-                RaycastHit hit;
-                Debug.DrawRay(rayOrigin, rayDirection, Color.red);
-                if (Physics.Raycast(ray, out hit))
-                {
-                    GameObject hitObject = hit.collider.gameObject;
-
-                    if (hitObject.name == "RedDetecter")
-                        GameController.Instance.QCodeDetecter.DetectGood(_good);
-                }
+                if (hitObject.name == "RedDetecter")
+                    GameController.Instance.QCodeDetecter.DetectGood(_good);
             }
         }
     }
@@ -166,5 +182,19 @@ public class DragObject : MonoBehaviour
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = Camera.main.transform.position.z * koef_mouse_pos;
         return Camera.main.ScreenToWorldPoint(mousePos);
+    }
+
+    private void OnEndGame(int index)
+    {
+        if (index != Index)
+            return;
+
+        _outline.enabled = false;
+        if (_isDragging)
+            LetGoItem();
+
+        _isActualGameIsEnd = true;
+
+        GameController.Instance.OnEndGame -= OnEndGame;
     }
 }

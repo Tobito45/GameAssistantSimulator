@@ -148,23 +148,19 @@ public class MonitorSelectGood : MonoBehaviour
                     if (movement.horizontal > 0.25f)
                     {
                         NextObjectSelect(i, -1);
-                        Debug.Log("Rogh");
                     }
                     else if (movement.horizontal < -0.25f)
                     {
                         NextObjectSelect(i, 1);
-                        Debug.Log("Left");
                     }
                     else if (movement.vertical > 0.25f)
                     {
                         NextObjectSelect(i, -_objectsWillBeIterrated[i].Count / 2);
-                        Debug.Log("up");
 
                     }
                     else if (movement.vertical < -0.25f)
                     {
                         NextObjectSelect(i, _objectsWillBeIterrated[i].Count / 2);
-                        Debug.Log("down");
                     }
                     timer[i] = 0.05f;
                 }

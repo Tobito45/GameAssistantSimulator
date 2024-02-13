@@ -19,6 +19,9 @@ public class GameController : MonoBehaviour
 
     [SerializeField]
     private EndMenuController _endMenuController;
+    
+    [SerializeField]
+    private MainController  _mainController;
 
     [SerializeField]
     private KeyboardAndJostickController _jostickController;
@@ -27,6 +30,11 @@ public class GameController : MonoBehaviour
     private QCodeDetecter _qCodeDetecter;
     [SerializeField]
     private SplitController _splitController;
+    [SerializeField]
+    private FirebaseController _firebaseController;
+    
+    [SerializeField]
+    private KeyBoardForJostic _keyboardForJostic;
     public bool IsTimerEnded() => _timer < 0;
 
     public float MaxTime => _maxTime;
@@ -37,15 +45,21 @@ public class GameController : MonoBehaviour
         _plusSum = new float[KeyboardAndJostickController.MAXPLAYERS], 
         _minusSum = new float[KeyboardAndJostickController.MAXPLAYERS], 
         _allSum = new float[KeyboardAndJostickController.MAXPLAYERS];
-    private int[] _all = new int[KeyboardAndJostickController.MAXPLAYERS], 
+    private int[] _all = new int[KeyboardAndJostickController.MAXPLAYERS],
         _allCorect = new int[KeyboardAndJostickController.MAXPLAYERS];
 
     private int[] _countClients ;
 
     public QCodeDetecter QCodeDetecter => _qCodeDetecter;
     public SplitController SplitController => _splitController;
+
+    public EndMenuController EndMenuController => _endMenuController;  
+    public MainController MainController => _mainController;  
+    public FirebaseController FirebaseController => _firebaseController;
+    public KeyBoardForJostic KeyBoardForJostic => _keyboardForJostic;
     
     public event Action OnStartNewGame;
+    public event Action<int> OnEndGame;
 
     private static GameController _instance;
     public static GameController Instance => _instance;
@@ -83,6 +97,7 @@ public class GameController : MonoBehaviour
     {
         OnStartNewGame += DeleteAllGoodsOnScene;
         OnStartNewGame += SetBasicInfo;
+        OnEndGame += EndGame;
 
         IsOpenedPanelUI = new bool[KeyboardAndJostickController.MAXPLAYERS];
     }
@@ -106,7 +121,8 @@ public class GameController : MonoBehaviour
 
         if (IsTimerEnded())
         {
-            EndGame(index);
+            //EndGame(index);
+            OnEndGame(index);
             return;
         }
 
@@ -156,6 +172,7 @@ public class GameController : MonoBehaviour
 
     }
 
+
     public void OnAddGood(GoodInfo good, int index) 
     {
         if (_basicGoodsName[index].Remove(this[good.GoodName]) == true)
@@ -170,12 +187,19 @@ public class GameController : MonoBehaviour
 
     private void EndClient(int index)
     {
+        var saveSum = _allSum[index];
         foreach (GoodInfo good in _basicGoodsName[index])
         {
             _minusSum[index] += good.Price;
         }
 
         _allSum[index] += _plusSum[index] - _minusSum[index];
+
+        if (_allSum[index] > saveSum)
+            _mainController.OnItemAdded(index, _allSum[index], true);
+        else
+            _mainController.OnItemAdded(index, _allSum[index], false);
+
         _endMenuController.AddElementToEnd(clientNumber: _countClients[index], countGoods: _all[index], correctGoods: _allCorect[index],
                                                     minusMoney: _minusSum[index], plusMoney: _plusSum[index], allSum: _sum[index], index: index); 
     }

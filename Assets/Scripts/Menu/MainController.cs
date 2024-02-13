@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -29,7 +30,7 @@ public class MainController : MonoBehaviour
     private TextMeshProUGUI textInfo;
 
     [SerializeField]
-    private TextMeshProUGUI[] textTimer;
+    private TextMeshProUGUI[] _textTimer, _textScore;
 
     [Header("Camers")]
     [SerializeField]
@@ -59,10 +60,24 @@ public class MainController : MonoBehaviour
         ActivateMenuControllingJostic();
     }
 
-    public void ActivateMenuControllingJostic()
+    public void ActivateMenuControllingJostic(GameObject parent = null)
     {
-        _outlines = FindObjectsOfType<UnityEngine.UI.Outline>().Select(g => g.gameObject).ToList();
+        if(parent == null)
+            _outlines = FindObjectsOfType<UnityEngine.UI.Outline>().Select(g => g.gameObject).OrderBy(x => x.transform.position.y).Reverse().ToList();
+        else
+            _outlines = parent.GetComponentsInChildren<UnityEngine.UI.Outline>().Select(g => g.gameObject).OrderBy(x => x.transform.position.y).Reverse().ToList();
+
         _outLineIndex = -1;
+    }
+
+    public void ClearMenuControllingJostic()
+    {
+        if(_outLineIndex != -1)
+            _outlines[_outLineIndex].GetComponent<UnityEngine.UI.Outline>().enabled = false;
+
+        _outlines.Clear();
+        _outLineIndex = -1;
+
     }
 
     public void PlayGame()
@@ -71,7 +86,7 @@ public class MainController : MonoBehaviour
         GameController.Instance.SplitController.SetActiveCamers(true);
 
         _panelMenu.SetActive(false);
-        _outlines.Clear();
+        ClearMenuControllingJostic();
         ForeachAllObjects(_panelGame, (obj) => { obj.SetActive(true); });
 
     }
@@ -80,7 +95,7 @@ public class MainController : MonoBehaviour
     {
         for(int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++) 
         {
-            GameController.Instance.SetTextTimer(textTimer[i], i);
+            GameController.Instance.SetTextTimer(_textTimer[i], i);
         }
         MenuControllerJostic();
         
@@ -132,25 +147,51 @@ public class MainController : MonoBehaviour
             if (KeyboardAndJostickController.GetAButton() != null && KeyboardAndJostickController.GetAButton().Contains(0))
             {
                 var selectedObj = _outlines[_outLineIndex];
-                if (selectedObj.GetComponent<Button>())
+
+                Button button = selectedObj.GetComponent<Button>();
+                TMP_InputField inputField = selectedObj.GetComponentInChildren<TMP_InputField>();
+                if (button)
                 {
-                   selectedObj.GetComponent<UnityEngine.UI.Outline>().enabled = false;
-                   selectedObj.GetComponent<Button>().onClick.Invoke();
-                   _outLineIndex = -1;         
-                } else if(selectedObj.GetComponentInChildren<TMP_InputField>())
+                //   selectedObj.GetComponent<UnityEngine.UI.Outline>().enabled = false;
+                   button.onClick.Invoke();
+                 //  _outLineIndex = -1;         
+                } else if(inputField)
                 {
-                    selectedObj.GetComponentInChildren<TMP_InputField>().text = (int.Parse(selectedObj.GetComponentInChildren<TMP_InputField>().text) + 1).ToString();
+                    if (inputField.contentType == TMP_InputField.ContentType.IntegerNumber)
+                        inputField.text = (int.Parse(inputField.text) + 1).ToString();
+                    else
+                    {
+                        GameController.Instance.KeyBoardForJostic.Active(true, () =>
+                        {
+                            ClearMenuControllingJostic();
+                            GameController.Instance.KeyBoardForJostic.OnSelected = null;
+                            ActivateMenuControllingJostic(FindObjectOfType<TMP_InputField>().gameObject.transform.parent.gameObject);
+                            GameController.Instance.KeyBoardForJostic.Active(false, null);
+                        });
+                        ClearMenuControllingJostic();
+                        GameController.Instance.KeyBoardForJostic.OnSelected += (c) =>
+                        {
+                            if(c == 'D')
+                            {
+                                inputField.text = inputField.text.Substring(0, inputField.text.Length - 1);
+                            }
+                            inputField.text += c.ToString();
+                        };
+                    }
                 }
             } else if (KeyboardAndJostickController.GetBButton() != null && KeyboardAndJostickController.GetBButton().Contains(0))
             {
                 var selectedObj = _outlines[_outLineIndex];
-                if (selectedObj.GetComponentInChildren<TMP_InputField>())
+                TMP_InputField inputField = selectedObj.GetComponentInChildren<TMP_InputField>();
+
+                if (inputField)
                 {
-                    selectedObj.GetComponentInChildren<TMP_InputField>().text = (int.Parse(selectedObj.GetComponentInChildren<TMP_InputField>().text) - 1).ToString();
+                    if (inputField.contentType == TMP_InputField.ContentType.IntegerNumber)
+                        inputField.text = (int.Parse(inputField.text) - 1).ToString();
+                    
                 }
             }
         }
-
     }
 
     public static void ForeachAllObjects<T>(T[] objects, Action<T> action)
@@ -159,6 +200,28 @@ public class MainController : MonoBehaviour
             action(obj);
     }
 
+    public static IEnumerator MakeActionAfterTime(Action actionBefore, Action actionAfter, float duraction)
+    {
+        actionBefore();
+        yield return new WaitForSeconds(duraction);
+        actionAfter();
+    }
+
+
+    public void OnItemAdded(int index, float score, bool isPlus)
+    {
+        _textScore[index].text = $"Score: {score:F2}";
+        var colourSafe = _textScore[index].color;
+        if (isPlus)
+        {
+           StartCoroutine(MakeActionAfterTime(() => _textScore[index].color = Color.green,
+                                () => _textScore[index].color = colourSafe, 2));
+        } else
+        {
+            StartCoroutine(MakeActionAfterTime(() => _textScore[index].color = Color.red,
+                                () => _textScore[index].color = colourSafe, 2));
+        }
+    }
 
     public void OpenMenuAndCloseGame()
     {

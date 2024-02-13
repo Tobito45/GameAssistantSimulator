@@ -16,6 +16,8 @@ public class GoodsController : MonoBehaviour
     [SerializeField]
     private Transform[] _pointerCreate;
 
+    private bool[] _isPlayerEnded = new bool[KeyboardAndJostickController.MAXPLAYERS];
+
     private void Start()
     {
         for (int i = 0; i < _goodsOnConveer.Count(); i++)
@@ -25,6 +27,7 @@ public class GoodsController : MonoBehaviour
             _indexSelected[i] = -1;
         }
 
+        MainController.ForeachAllObjects(_isPlayerEnded, (x) => x = false);
         GameController.Instance.OnStartNewGame += ClearList;
     }
 
@@ -34,7 +37,7 @@ public class GoodsController : MonoBehaviour
 
         foreach (int index in KeyboardAndJostickController.MoveGoodsConveyor())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
                 continue;
 
             foreach (GameObject good in _goodsOnConveer[index])//[0])
@@ -46,14 +49,14 @@ public class GoodsController : MonoBehaviour
 
         foreach (int index in KeyboardAndJostickController.ChangeGoods())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
                 continue;
             IndexSelectedItemPlus(index);
         }
 
         foreach (int index in KeyboardAndJostickController.TakeGood())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
                 continue;
 
             if (_indexSelected[index] != -1)
@@ -65,7 +68,7 @@ public class GoodsController : MonoBehaviour
 
         foreach (int index in KeyboardAndJostickController.LetsGoGood())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
                 continue;
             
             _goodSelected[index] = null;
@@ -177,4 +180,6 @@ public class GoodsController : MonoBehaviour
         }
 
     }
+
+    private void OnEndGame(int index) => _isPlayerEnded[index] = true;
 }

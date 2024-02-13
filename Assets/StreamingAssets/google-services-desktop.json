@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "168228056187",
+    "firebase_url": "https://shopassistantsimulator-default-rtdb.firebaseio.com",
+    "project_id": "shopassistantsimulator",
+    "storage_bucket": "shopassistantsimulator.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168228056187:android:52425341eab5a6d54b06de",
+        "android_client_info": {
+          "package_name": "com.Games45.ShopAssistantSimulator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp2eHQSea0EveTu-UgBAux1y7j3frWO-Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
