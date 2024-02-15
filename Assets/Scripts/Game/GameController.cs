@@ -34,7 +34,7 @@ public class GameController : MonoBehaviour
     private FirebaseController _firebaseController;
     
     [SerializeField]
-    private KeyBoardForJostic _keyboardForJostic;
+    private InputKeyboardController _keyboardForJostic;
     public bool IsTimerEnded() => _timer < 0;
 
     public float MaxTime => _maxTime;
@@ -56,7 +56,7 @@ public class GameController : MonoBehaviour
     public EndMenuController EndMenuController => _endMenuController;  
     public MainController MainController => _mainController;  
     public FirebaseController FirebaseController => _firebaseController;
-    public KeyBoardForJostic KeyBoardForJostic => _keyboardForJostic;
+    public InputKeyboardController KeyBoardForJostic => _keyboardForJostic;
     
     public event Action OnStartNewGame;
     public event Action<int> OnEndGame;

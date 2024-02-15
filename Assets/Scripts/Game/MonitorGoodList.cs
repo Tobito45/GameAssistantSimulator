@@ -52,6 +52,9 @@ public class MonitorGoodList : MonoBehaviour
 
     public void ClearGoods(int i)
     {
+        if (index != i)
+            return;
+
         _goodList.Clear();
         foreach(Transform item in _goodsInScrollContent)
         {

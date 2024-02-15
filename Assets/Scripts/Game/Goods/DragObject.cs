@@ -149,7 +149,7 @@ public class DragObject : MonoBehaviour
                 GameObject hitObject = hit.collider.gameObject;
 
                 if (hitObject.name == "RedDetecter")
-                    GameController.Instance.QCodeDetecter.DetectGood(_good);
+                    GameController.Instance.QCodeDetecter.DetectGood(_good, Index);
             }
         }
     }

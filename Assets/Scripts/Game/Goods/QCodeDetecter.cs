@@ -6,12 +6,12 @@ using UnityEngine;
 public class QCodeDetecter : MonoBehaviour
 {
     [SerializeField]
-    private MonitorGoodList _monitorGoodList;
+    private MonitorGoodList[] _monitorGoodList;
 
    
-    public void DetectGood(GoodInfo good)
+    public void DetectGood(GoodInfo good, int index)
     {
-        _monitorGoodList.AddGood(good);
+        _monitorGoodList[index].AddGood(good);
         good.IsScaned = true;
     }
 }

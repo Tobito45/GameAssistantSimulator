@@ -6,15 +6,16 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EndMenuController : MonoBehaviour
 {
     private const string keySave = "IndexSavedGame";
     private const string pattern = @"\((.*?)\)";
-    
+
     [Header("GameObjects")]
     [SerializeField]
-    private GameObject[] _panelEnd, _panelInputName;
+    private GameObject[] _panelEnd, _panelInputName, _saveButtons;
     [SerializeField]
     private GameObject[] _scrollContent;
     [SerializeField]
@@ -40,6 +41,15 @@ public class EndMenuController : MonoBehaviour
     {
         MainController.ForeachAllObjects(_panelEnd, (obj) => obj.SetActive(false));
         GameController.Instance.OnStartNewGame += ClearScroll;
+
+        for (int i = 0; i < _saveButtons.Length; i++)
+        {
+            int index = i; 
+            _saveButtons[i].GetComponent<Button>().onClick.AddListener(() => {
+                _mainController.ActivateMenuControllingJostic(index, _panelInputName[index]);
+            });
+
+        }
     }
 
     public void AddElementToEnd(int clientNumber, int countGoods, int correctGoods, float minusMoney, float plusMoney, float allSum, int index)
@@ -66,7 +76,7 @@ public class EndMenuController : MonoBehaviour
     public void ActivePanel(int index)
     {
         _panelEnd[index].SetActive(true);
-        _mainController.ActivateMenuControllingJostic();
+        _mainController.ActivateMenuControllingJostic(index, _panelEnd[index]);
     }
 
     public void AktualText(float sum, int index) => _textScope[index].text = $"Your scope: {sum.ToString("F2")}"; 
