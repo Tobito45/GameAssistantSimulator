@@ -72,7 +72,6 @@ public class KeyboardAndJostickController : MonoBehaviour
                    .ToList();
 
             return list;
-            //return Gamepad.all[0].aButton.wasPressedThisFrame;
         }
         return null;
     }
@@ -89,7 +88,22 @@ public class KeyboardAndJostickController : MonoBehaviour
                    .ToList();
 
             return list;
-            //return Gamepad.all[0].bButton.wasPressedThisFrame;
+        }
+        return null;
+    }
+
+    public static IEnumerable<int> GetYButton()
+    {
+        if (IsJosticConnected)
+        {
+            var list = new List<int>();
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.yButton.wasPressedThisFrame)
+                   .Select(x => x.index)
+                   .ToList();
+
+            return list;
         }
         return null;
     }

@@ -15,6 +15,11 @@ public class SplitController : MonoBehaviour
         
     }
 
+    private void Update()
+    {
+        
+    }
+
     public void SetActiveCamers(bool set)
     {
         if(!set)

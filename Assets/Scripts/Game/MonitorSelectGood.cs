@@ -100,19 +100,12 @@ public class MonitorSelectGood : MonoBehaviour
 
         DetectUIChanges();
 
-        // foreach (int index in KeyboardAndJostickController.SelectGoodOnMonitor())
-        //   _buttonAccept[index].onClick.Invoke();
     }
 
     private void DetectUIChanges()
     {
         if (KeyboardAndJostickController.IsJosticConnected)
         {
-            if(!_mainController.IsMenu)
-                foreach (int index in KeyboardAndJostickController.SelectGoodOnMonitor())
-                    ActiveOrDisableCanvasSelect(index);
-
-
             foreach (int index in KeyboardAndJostickController.GetAButton())
             {
                 if (!GameController.Instance.IsOpenedPanelUI[index])
@@ -120,11 +113,9 @@ public class MonitorSelectGood : MonoBehaviour
 
                 _buttonAccept[index].onClick.Invoke();
             }
+             
 
-            //if (KeyboardAndJostickController.GetAButton())
-            //  _buttonAccept[0].onClick.Invoke();
-
-            foreach (int index in KeyboardAndJostickController.GetBButton())
+            foreach (int index in KeyboardAndJostickController.GetYButton())
             {
                 if (!GameController.Instance.IsOpenedPanelUI[index])
                     continue;
@@ -132,8 +123,21 @@ public class MonitorSelectGood : MonoBehaviour
                 _buttonPay[index].onClick.Invoke();
             }
 
-            //if (KeyboardAndJostickController.GetBButton())
-            //    _buttonPay[0].onClick.Invoke();
+            if (!_mainController.IsMenu)
+            {
+
+                foreach (int index in KeyboardAndJostickController.GetBButton())
+                {
+                    if (_selecterCanvas[index].activeInHierarchy)
+                        ActiveOrDisableCanvasSelect(index);
+                }
+
+                foreach (int index in KeyboardAndJostickController.GetYButton())
+                {
+                    if (!_selecterCanvas[index].activeInHierarchy)
+                        ActiveOrDisableCanvasSelect(index);
+                }
+            }
 
 
             for (int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++)
@@ -174,7 +178,7 @@ public class MonitorSelectGood : MonoBehaviour
 
 
 
-    private void ActiveOrDisableCanvasSelect(int index)
+    public void ActiveOrDisableCanvasSelect(int index)
     {
         GameController.Instance.IsOpenedPanelUI[index] = !_selecterCanvas[index].activeInHierarchy;
         _yPanel[index].SetActive(_selecterCanvas[index].activeInHierarchy && KeyboardAndJostickController.IsJosticConnected);

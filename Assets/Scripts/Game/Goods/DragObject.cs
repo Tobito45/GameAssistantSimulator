@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using TMPro;
 using UnityEngine;
 
 public class DragObject : MonoBehaviour
@@ -10,6 +11,9 @@ public class DragObject : MonoBehaviour
 
     [SerializeField]
     private GameObject _qCodeObject;
+
+    [SerializeField]
+    private TextMeshPro _textQrCode;
 
     private const float koef_mouse_pos = 0.045f;
     private const float SPEED = 0.5f;
@@ -50,6 +54,8 @@ public class DragObject : MonoBehaviour
 
         GameController.Instance.OnEndGame += OnEndGame;
 
+        if(_textQrCode != null)
+            _textQrCode.gameObject.SetActive(UnityEngine.Random.Range(0, 2) == 0);
     }
 
     private void OnMouseDown()
