@@ -9,7 +9,8 @@ using UnityEngine.UI;
 
 public class MonitorSelectGood : MonoBehaviour
 {
-    private const float cooldown = 3f;
+    private const float COOLDOWN = 3f;
+    private const int MAXCOUNTMODES = 2;
 
     [Header("Json")]
     [SerializeField]
@@ -40,6 +41,7 @@ public class MonitorSelectGood : MonoBehaviour
 
     private List<GameObject>[] _objectsWillBeIterrated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _indexForIterator = new int[KeyboardAndJostickController.MAXPLAYERS];
+    private ButtonModesIterrator[] _iteratorForButtonsSelectMode = new ButtonModesIterrator[KeyboardAndJostickController.MAXPLAYERS];
 
     public Action<int> AfterPay;
 
@@ -139,6 +141,14 @@ public class MonitorSelectGood : MonoBehaviour
                 }
             }
 
+            foreach (int index in KeyboardAndJostickController.GetButtonLT())
+            {
+                if (GameController.Instance.IsOpenedPanelUI[index])
+                    continue;
+
+                _buttonAccept[index].onClick.Invoke();
+            }
+
 
             for (int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++)
             {
@@ -176,7 +186,10 @@ public class MonitorSelectGood : MonoBehaviour
         }
     }
 
-
+    public void ActivaeButtonModeWithIterator(int index)
+    {
+       
+    }
 
     public void ActiveOrDisableCanvasSelect(int index)
     {
@@ -238,7 +251,7 @@ public class MonitorSelectGood : MonoBehaviour
             GameController.Instance.IsOpenedPanelUI[index] = false;
         }
         
-        yield return new WaitForSeconds(cooldown);
+        yield return new WaitForSeconds(COOLDOWN);
         _buttonPay[index].interactable = true;
 
     }
@@ -252,4 +265,22 @@ class SelectedDataJson
 
     public float Price { get; set; }
 
+}
+
+[System.Serializable]
+class ButtonModesIterrator
+{
+    [SerializeField]
+    private List<GameObject> _buttons;
+
+    private int _iterator;
+
+    public Button NextButton()
+    {
+        _iterator++;
+        if(_iterator >= _buttons.Count)
+            _iterator = 0;
+
+        return _buttons[_iterator].GetComponent<Button>();
+    }
 }

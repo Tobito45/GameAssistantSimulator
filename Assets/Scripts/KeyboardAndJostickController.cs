@@ -140,7 +140,7 @@ public class KeyboardAndJostickController : MonoBehaviour
         return (horizontalInput, verticalInput);
     }
 
-    public static IEnumerable<int> MoveGoodsConveyor()
+    public static IEnumerable<int> GetButtonLT()
     {
         if (!IsJosticConnected)
             return Input.GetKey(KeyCode.Space) ? new List<int> { 0 } : new List<int>();

@@ -35,7 +35,7 @@ public class GoodsController : MonoBehaviour
     {
 
 
-        foreach (int index in KeyboardAndJostickController.MoveGoodsConveyor())
+        foreach (int index in KeyboardAndJostickController.GetButtonLT())
         {
             if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
                 continue;
