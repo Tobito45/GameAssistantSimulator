@@ -185,6 +185,19 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public bool GetByCode(string code, int index, out GoodInfo goodInfo)
+    {
+        goodInfo = _basicGoodsName[index].Find(x => x.GetComponent<DragObject>().HasQrCode && x.GetComponent<DragObject>().GetCode == code);
+        if (goodInfo)
+        {
+            _basicGoodsName[index].Remove(goodInfo);
+            _allCorect[index]++;
+            _plusSum[index] += goodInfo.Price;
+            return true;
+        }
+        return false;
+    }
+
     private void EndClient(int index)
     {
         var saveSum = _allSum[index];

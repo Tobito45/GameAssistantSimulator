@@ -6,6 +6,7 @@ using System.Reflection;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 public class MainController : MonoBehaviour
@@ -103,6 +104,9 @@ public class MainController : MonoBehaviour
 
     public void PlayGame()
     {
+        foreach (var text in _textScore)
+            text.text = "Score: 0";
+        
         _mainCamera.gameObject.SetActive(false);
         GameController.Instance.SplitController.SetActiveCamers(true);
 
@@ -255,7 +259,7 @@ public class MainController : MonoBehaviour
 
 
         ActivateMenuControllingJostic(0);
-
+        
 
         GameController.Instance.SplitController.SetActiveCamers(false);
         _mainCamera.gameObject.SetActive(true);

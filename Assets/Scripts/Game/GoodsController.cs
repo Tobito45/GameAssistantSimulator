@@ -1,9 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 public class GoodsController : MonoBehaviour
 {
+    [SerializeField]
+    private MonitorSelectGood _monitorSelectGood;
+    [SerializeField]
+    private MainController _mainController;
+
     private const float distanceBetweenObjects = 0.05f;
     private const float moveObjects = -0.4f;
     private const float picesOfObject = 4f;
@@ -13,10 +20,11 @@ public class GoodsController : MonoBehaviour
     private DragObject[] _goodSelected = new DragObject[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _indexSelected = new int[KeyboardAndJostickController.MAXPLAYERS];
 
-    [SerializeField]
-    private Transform[] _pointerCreate;
-
     private bool[] _isPlayerEnded = new bool[KeyboardAndJostickController.MAXPLAYERS];
+    private bool[] _lockAutoPay = new bool[KeyboardAndJostickController.MAXPLAYERS];
+
+    [SerializeField]
+    private GoodsPlayerIterrator[] _UIPlayerElements = new GoodsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
 
     private void Start()
     {
@@ -25,17 +33,21 @@ public class GoodsController : MonoBehaviour
             _goodsOnConveer[i] = new HashSet<GameObject>();
             _goodsCanBeSelected[i] = new List<DragObject>();
             _indexSelected[i] = -1;
+            _lockAutoPay[i] = false;
+
+            _monitorSelectGood.AfterPay += AfterPayLocker;
         }
 
         MainController.ForeachAllObjects(_isPlayerEnded, (x) => x = false);
         GameController.Instance.OnStartNewGame += ClearList;
+        //GameController.Instance.OnEndGame += OnEndGame;
     }
 
     private void Update()
     {
 
 
-        foreach (int index in KeyboardAndJostickController.GetButtonLT())
+        foreach (int index in KeyboardAndJostickController.MoveGoodsConveyon())
         {
             if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
                 continue;
@@ -70,10 +82,38 @@ public class GoodsController : MonoBehaviour
         {
             if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
                 continue;
-            
+
             _goodSelected[index] = null;
         }
 
+        for (int i = 0; i < 2; i++)//TODO
+        {
+            if (GameController.Instance.IsOpenedPanelUI[i] || _isPlayerEnded[i])
+                _UIPlayerElements[i].GetFooterPanel.SetActive(false);
+            else
+                _UIPlayerElements[i].GetFooterPanel.SetActive(true);
+
+            if (_goodSelected[i] != null)
+            {
+                _UIPlayerElements[i].GetLetGoPanel.SetActive(true);
+                _UIPlayerElements[i].GetPickPanel.SetActive(false);
+            } else if (_goodsCanBeSelected[i].Count > 0) 
+            {
+                _UIPlayerElements[i].GetLetGoPanel.SetActive(false);
+                _UIPlayerElements[i].GetPickPanel.SetActive(true);
+            } else
+            {
+                _UIPlayerElements[i].GetLetGoPanel.SetActive(false);
+                _UIPlayerElements[i].GetPickPanel.SetActive(false);
+            }
+
+
+            if (!_lockAutoPay[i] && _goodsCanBeSelected[i].Count == 0 && _goodSelected[i] == null && _goodsOnConveer[i].Count == 0
+                    && !_mainController.IsMenu) 
+            {
+                _monitorSelectGood.OnPay(i);
+            }
+        }
     }
 
 
@@ -87,11 +127,11 @@ public class GoodsController : MonoBehaviour
             aktualGoodX = (aktrualGood.transform.position.x, aktrualGood.transform.lossyScale.x, 1);
         }
 
-        var newObject = Instantiate(GeneratorGoods.Instance.GetRandomGood(), _pointerCreate[index].transform.position, Quaternion.identity);
+        var newObject = Instantiate(GeneratorGoods.Instance.GetRandomGood(), _UIPlayerElements[index].GetPointCreate.transform.position, Quaternion.identity);
 
 
-        newObject.transform.position += new Vector3(((aktualGoodX.posX - _pointerCreate[index].position.x)
-                                    + aktualGoodX.sizeX / picesOfObject + newObject.transform.lossyScale.x / picesOfObject 
+        newObject.transform.position += new Vector3(((aktualGoodX.posX - _UIPlayerElements[index].GetPointCreate.position.x)
+                                    + aktualGoodX.sizeX / picesOfObject + newObject.transform.lossyScale.x / picesOfObject
                                     + distanceBetweenObjects) * aktualGoodX.deteceted, 0, 0);
 
         newObject.GetComponent<DragObject>().OnEnterContainer += AddGood;
@@ -99,6 +139,8 @@ public class GoodsController : MonoBehaviour
         newObject.GetComponent<DragObject>().OnLetGoGood += RemoveIntemFromSelected;
         newObject.GetComponent<DragObject>().Index = index;
         _goodsOnConveer[index].Add(newObject);
+
+        _lockAutoPay[index] = false;
         return newObject;
     }
 
@@ -110,10 +152,15 @@ public class GoodsController : MonoBehaviour
             _goodsCanBeSelected[i].Clear();
             _goodSelected[i] = null;
             _indexSelected[i] = -1;
-
         }
 
+        for (int i = 0; i < 2; i++)//TODO
+        {
+            _UIPlayerElements[i].GetFooterPanel.SetActive(true);
+        }
     }
+
+    private void AfterPayLocker(int index) => _lockAutoPay[index] = true; 
 
     private void RemoveIntemFromSelected(DragObject good, int index)
     {
@@ -136,6 +183,7 @@ public class GoodsController : MonoBehaviour
         _goodsCanBeSelected[index].Add(good.GetComponent<DragObject>());
         if (_goodsCanBeSelected[index].Count == 1)
             IndexSelectedSet(0, index);
+
     }
 
 
@@ -168,7 +216,7 @@ public class GoodsController : MonoBehaviour
 
     private void IndexSelectedSet(int newIndex, int index)
     {
-        if(_indexSelected[index] >= 0 && _indexSelected[index] < _goodsCanBeSelected[index].Count)
+        if (_indexSelected[index] >= 0 && _indexSelected[index] < _goodsCanBeSelected[index].Count)
         {
             _goodsCanBeSelected[index][_indexSelected[index]].CanBeSelected(false);
             _goodsCanBeSelected[index][_indexSelected[index]].LetGoItem();
@@ -181,5 +229,24 @@ public class GoodsController : MonoBehaviour
 
     }
 
-    private void OnEndGame(int index) => _isPlayerEnded[index] = true;
+    private void OnEndGame(int index) {
+        _UIPlayerElements[index].GetFooterPanel.SetActive(false);
+        _isPlayerEnded[index] = true;
+    }
+}
+
+
+[System.Serializable]
+class GoodsPlayerIterrator
+{
+    [SerializeField]
+    private Transform _pointerCreate;
+
+    [SerializeField]
+    private GameObject _footerPanel, _pickPanel, _letGoPanel;
+
+    public Transform GetPointCreate => _pointerCreate;
+    public GameObject GetFooterPanel => _footerPanel;
+    public GameObject GetPickPanel => _pickPanel;
+    public GameObject GetLetGoPanel => _letGoPanel;
 }

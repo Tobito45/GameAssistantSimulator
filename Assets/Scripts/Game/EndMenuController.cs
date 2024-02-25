@@ -79,12 +79,15 @@ public class EndMenuController : MonoBehaviour
         _mainController.ActivateMenuControllingJostic(index, _panelEnd[index]);
     }
 
-    public void AktualText(float sum, int index) => _textScope[index].text = $"Your scope: {sum.ToString("F2")}"; 
-
+    public void AktualText(float sum, int index)
+    {
+        _textScope[index].text = $"Your scope: {sum.ToString("F2")}";
+    }
     public void ClosePanelEnd()
     {
         MainController.ForeachAllObjects(_panelEnd, (obj) => obj.SetActive(false));
         _mainController.OpenMenuAndCloseGame();
+
     }
 
     public void SaveData()
@@ -126,7 +129,7 @@ public class EndMenuController : MonoBehaviour
         }
 
         GameController.Instance.FirebaseController.SaveUserScore(_inputFieldsName[index].text, GameController.Instance.AllSum(index), 
-                            (int)GameController.Instance.MaxTime, DateTime.Now.ToString());
+                            (int)GameController.Instance.MaxTime, DateTime.Now.ToString("dd.MM.yyyy H:mm:ss"));
 
         _panelInputName[index].SetActive(false);
     }

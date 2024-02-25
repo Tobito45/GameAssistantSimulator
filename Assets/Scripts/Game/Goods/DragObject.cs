@@ -6,7 +6,7 @@ using UnityEngine;
 public class DragObject : MonoBehaviour
 {
     public static float BOARDERTOLETGOGOOD = -2.1f;
-    public static float BOARDERCANOTMOVE = -2.0f;
+    public static float BOARDERCANOTMOVE = -1.95f;
 
 
     [SerializeField]
@@ -36,6 +36,7 @@ public class DragObject : MonoBehaviour
     public event Action<DragObject, int> OnLetGoGood;
 
     public GameObject GetQCodeObject => _qCodeObject;
+    public string GetCode => _textQrCode.text;
     public int Index { get; set; }
 
 
@@ -54,8 +55,22 @@ public class DragObject : MonoBehaviour
 
         GameController.Instance.OnEndGame += OnEndGame;
 
-        if(_textQrCode != null)
-            _textQrCode.gameObject.SetActive(UnityEngine.Random.Range(0, 2) == 0);
+        if (_textQrCode != null)
+        {
+            _textQrCode.text = null;
+            if(UnityEngine.Random.Range(0, 2) == 0)
+            {
+                _textQrCode.gameObject.SetActive(true);
+                for(int i = 0; i < 5; i++)
+                {
+                    _textQrCode.text = _textQrCode.text + UnityEngine.Random.Range(1, 9).ToString();
+                }
+            } else
+            {
+                _textQrCode.gameObject.SetActive(false);
+            }
+
+        }
     }
 
     private void OnMouseDown()
@@ -103,6 +118,8 @@ public class DragObject : MonoBehaviour
         _rotateController.SetObjectRotate(Index, null);
     }
 
+    public bool HasQrCode => _textQrCode != null && _textQrCode.gameObject.activeSelf;
+
     private void Update()
     {
         if (_isActualGameIsEnd)
@@ -137,12 +154,11 @@ public class DragObject : MonoBehaviour
     private void MoveGood()
     {
         (float horizontal, float vertical) input = KeyboardAndJostickController.GetMovement(Index);
-        if (transform.position.y + input.vertical *Time.deltaTime < BOARDERCANOTMOVE)
+        if (transform.position.y + input.vertical * Time.deltaTime < BOARDERCANOTMOVE)
             input.vertical = 0;
 
-
         transform.position += new Vector3(input.horizontal, input.vertical, 0) * SPEED * Time.deltaTime;
-        if (_qCodeObject != null && _good.IsScaned == false)
+        if (_qCodeObject != null && _good.IsScaned == false && !HasQrCode)
         {
             Vector3 rayOrigin = _qCodeObject.transform.position;
             Vector3 rayDirection = _qCodeObject.transform.up;
