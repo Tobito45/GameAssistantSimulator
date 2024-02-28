@@ -77,7 +77,7 @@ public class DragObject : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            //TakeItem();
+            TakeItem();
         }
     }
 
@@ -97,6 +97,9 @@ public class DragObject : MonoBehaviour
 
     public void CanBeSelected(bool canBeSelected)
     {
+        if (!KeyboardAndJostickController.IsJosticConnected)
+            return;
+
         if (canBeSelected)
         {
             //GetComponent<MeshRenderer>().material = _selectedMaterial;
@@ -153,11 +156,27 @@ public class DragObject : MonoBehaviour
 
     private void MoveGood()
     {
-        (float horizontal, float vertical) input = KeyboardAndJostickController.GetMovement(Index);
-        if (transform.position.y + input.vertical * Time.deltaTime < BOARDERCANOTMOVE)
-            input.vertical = 0;
+        (float horizontal, float vertical) input = (0.0f, 0.0f);
+        if (KeyboardAndJostickController.IsJosticConnected)
+        {
+            input = KeyboardAndJostickController.GetMovement(Index);
 
-        transform.position += new Vector3(input.horizontal, input.vertical, 0) * SPEED * Time.deltaTime;
+            if (transform.position.y + input.vertical * Time.deltaTime < BOARDERCANOTMOVE && input.vertical < 0)
+                input.vertical = 0;
+
+            transform.position += new Vector3(input.horizontal, input.vertical, 0) * SPEED * Time.deltaTime;
+        }
+        else
+        {
+            Vector3 mousePos = GetMouseWorldPosition();
+            input = (mousePos.x,mousePos.y);
+
+            if (input.vertical + _offset.y < BOARDERCANOTMOVE)
+                transform.position = new Vector3(input.horizontal + _offset.x, transform.position.y, transform.position.z);
+            else
+                transform.position = new Vector3(input.horizontal + _offset.x, input.vertical + _offset.y, transform.position.z);
+        }
+
         if (_qCodeObject != null && _good.IsScaned == false && !HasQrCode)
         {
             Vector3 rayOrigin = _qCodeObject.transform.position;
@@ -192,7 +211,7 @@ public class DragObject : MonoBehaviour
         if (collision.gameObject.tag == "Container")
         {
             //GetComponent<MeshRenderer>().material = _detectedMaterial;
-            _outline.enabled = true;
+            _outline.enabled = true && KeyboardAndJostickController.IsJosticConnected;
             _outline.OutlineColor = Color.yellow;
             Match match = Regex.Match(collision.gameObject.name, @"\d+");
             OnExitContainer(this.gameObject, int.Parse(match.Value) - 1);

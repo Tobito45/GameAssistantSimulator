@@ -280,6 +280,7 @@ public class MonitorSelectGood : MonoBehaviour
         AfterPay(index);
         _buttonsModes[index].GetButtonLeft.interactable = false;
         _selecterCanvas[index].SetActive(false);
+        GameController.Instance.IsOpenedPanelUI[index] = false;
 
         if (KeyboardAndJostickController.IsJosticConnected)
         {
@@ -291,8 +292,9 @@ public class MonitorSelectGood : MonoBehaviour
         _buttonsModes[index].GetInputFieldNumber.text = null;
         _buttonsModes[index].GetButtonLeft.interactable = true;
 
-        if(GameController.Instance.IsOpenedPanelUI[index])
-            ActiveOrDisableCanvasSelect(index);
+        _yPanel[index].SetActive(true);
+        //if(GameController.Instance.IsOpenedPanelUI[index])
+        //    ActiveOrDisableCanvasSelect(index);
     }
 }
 

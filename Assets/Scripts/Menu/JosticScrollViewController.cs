@@ -38,7 +38,7 @@ public class JosticScrollViewController : MonoBehaviour
        // Debug.Log(movement.horizontal + " " + );
         if (((_index == -1 && !_controllWithStics && KeyboardAndJostickController.GetUpButton().Count() > 0) ||
                 KeyboardAndJostickController.GetUpButton().Contains(_index)) ||
-                (_controllWithStics && movement.vertical > 0))
+                (_controllWithStics && movement.vertical > 0.25f))
         {
             if(_vericalScrollBar != null)
                 _vericalScrollBar.value += _speed * Time.deltaTime;
@@ -47,7 +47,7 @@ public class JosticScrollViewController : MonoBehaviour
         //if ((_index == -1 && KeyboardAndJostickController.GetDownButton().Count() > 0) || KeyboardAndJostickController.GetDownButton().Contains(_index))
         if (((_index == -1 && !_controllWithStics && KeyboardAndJostickController.GetDownButton().Count() > 0) ||
                 KeyboardAndJostickController.GetDownButton().Contains(_index)) ||
-                (_controllWithStics && movement.vertical < 0))
+                (_controllWithStics && movement.vertical < -0.25f))
         {
             if (_vericalScrollBar != null)
                 _vericalScrollBar.value -= _speed * Time.deltaTime;
@@ -56,7 +56,7 @@ public class JosticScrollViewController : MonoBehaviour
         //if ((_index == -1 && KeyboardAndJostickController.GetLeftButton().Count() > 0) || KeyboardAndJostickController.GetLeftButton().Contains(_index))
         if (((_index == -1 && !_controllWithStics && KeyboardAndJostickController.GetLeftButton().Count() > 0) || 
                 KeyboardAndJostickController.GetLeftButton().Contains(_index)) ||
-                (_controllWithStics && movement.horizontal > 0))
+                (_controllWithStics && movement.horizontal > 0.25f))
         {
             if (_horizontalScrollBar != null)
                 _horizontalScrollBar.value -= _speed * Time.deltaTime;
@@ -65,7 +65,7 @@ public class JosticScrollViewController : MonoBehaviour
         //if ((_index == -1 && KeyboardAndJostickController.GetRigthButton().Count() > 0) || KeyboardAndJostickController.GetRigthButton().Contains(_index))
         if (((_index == -1 && !_controllWithStics && KeyboardAndJostickController.GetRigthButton().Count() > 0) ||
                 KeyboardAndJostickController.GetRigthButton().Contains(_index)) ||
-                (_controllWithStics && movement.horizontal < 0))
+                (_controllWithStics && movement.horizontal < -0.25f))
         {
             if (_horizontalScrollBar != null)
                 _horizontalScrollBar.value += _speed * Time.deltaTime;

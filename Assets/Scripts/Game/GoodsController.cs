@@ -45,8 +45,6 @@ public class GoodsController : MonoBehaviour
 
     private void Update()
     {
-
-
         foreach (int index in KeyboardAndJostickController.MoveGoodsConveyon())
         {
             if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
@@ -84,6 +82,12 @@ public class GoodsController : MonoBehaviour
                 continue;
 
             _goodSelected[index] = null;
+        }
+
+        if(!KeyboardAndJostickController.IsJosticConnected)
+        {
+            _UIPlayerElements[0].GetFooterPanel.SetActive(false);
+            return;
         }
 
         for (int i = 0; i < 2; i++)//TODO
