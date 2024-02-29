@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -24,11 +25,11 @@ public class MonitorSelectGood : MonoBehaviour
     private Image _goodPrefab;
     [SerializeField]
     private GameObject _numberPrefab;
-    [SerializeField]
-    private MonitorGoodList[] _goodList;
+   // [SerializeField]
+   // private MonitorGoodList[] _goodList;
 
-    [SerializeField]
-    private GameObject[] _monitorSelecter, _yPanel, _selecterCanvas;
+    //[SerializeField]
+    //private GameObject[] _monitorSelecter, _yPanel, _selecterCanvas;
     private float[] timer = new float[KeyboardAndJostickController.MAXPLAYERS];
 
     [SerializeField]
@@ -40,7 +41,9 @@ public class MonitorSelectGood : MonoBehaviour
     private int[] _indexForIterator = new int[KeyboardAndJostickController.MAXPLAYERS];
 
     [SerializeField]
-    private MonitorSelectPlayerIterrator[] _buttonsModes = new MonitorSelectPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    private MonitorSelectUIPlayerIterrator[] _buttonsModes = new MonitorSelectUIPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    [SerializeField]
+    private MonitorSelectSceneObjectsPlayerIterrator[] _objectsScene = new MonitorSelectSceneObjectsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
 
     public Action<int> AfterPay;
 
@@ -50,7 +53,7 @@ public class MonitorSelectGood : MonoBehaviour
         string jsonFile = json.ToString();
         SelectedDataJson[] dataObject = JsonConvert.DeserializeObject<SelectedDataJson[]>(jsonFile);
 
-        for (int i = 0; i < _goodList.Length; i++)
+        for (int i = 0; i < 3; i++) //TODO
         {
             foreach (var item in dataObject)
             {
@@ -67,7 +70,7 @@ public class MonitorSelectGood : MonoBehaviour
                 int index = i;
                 button.GetComponent<Button>().onClick.AddListener(() => OnSelectObject(obj.gameObject, index));
             }
-            AfterPay += _goodList[i].ClearGoods;
+            AfterPay += _objectsScene[i].GetGoodList.ClearGoods;
 
             for (int j = 1; j <= 9; j++)
             {
@@ -79,8 +82,8 @@ public class MonitorSelectGood : MonoBehaviour
             ActivaeButtonModeWithIterator(i);
 
         }
-        MainController.ForeachAllObjects(_monitorSelecter, (g) => g.SetActive(false));
-        MainController.ForeachAllObjects(_yPanel, (g) => g.SetActive(true));
+        MainController.ForeachAllObjects(_objectsScene.Where(n => n.GetMonitroSelecter != null).Select(n => n.GetMonitroSelecter).ToArray(), (g) => g.SetActive(false));
+        MainController.ForeachAllObjects(_objectsScene.Where(n => n.GetYPanel != null).Select(n => n.GetYPanel).ToArray(), (g) => g.SetActive(true));
 
     }
 
@@ -135,13 +138,13 @@ public class MonitorSelectGood : MonoBehaviour
 
                 foreach (int index in KeyboardAndJostickController.GetBButton())
                 {
-                    if (_selecterCanvas[index].activeInHierarchy)
+                    if (_objectsScene[index].GetSelecterCanvas.activeInHierarchy)
                         ActiveOrDisableCanvasSelect(index);
                 }
 
                 foreach (int index in KeyboardAndJostickController.GetYButton())
                 {
-                    if (!_selecterCanvas[index].activeInHierarchy)
+                    if (!_objectsScene[index].GetSelecterCanvas.activeInHierarchy)
                         ActiveOrDisableCanvasSelect(index);
                 }
             }
@@ -206,9 +209,9 @@ public class MonitorSelectGood : MonoBehaviour
 
     public void ActiveOrDisableCanvasSelect(int index)
     {
-        GameController.Instance.IsOpenedPanelUI[index] = !_selecterCanvas[index].activeInHierarchy;
-        _yPanel[index].SetActive(_selecterCanvas[index].activeInHierarchy);
-        _selecterCanvas[index].SetActive(!_selecterCanvas[index].activeInHierarchy);
+        GameController.Instance.IsOpenedPanelUI[index] = !_objectsScene[index].GetSelecterCanvas.activeInHierarchy;
+        _objectsScene[index].GetYPanel.SetActive(_objectsScene[index].GetSelecterCanvas.activeInHierarchy);
+        _objectsScene[index].GetSelecterCanvas.SetActive(!_objectsScene[index].GetSelecterCanvas.activeInHierarchy);
 
     }
 
@@ -241,7 +244,7 @@ public class MonitorSelectGood : MonoBehaviour
         var getInfo = _selectedObject[index].GetComponentInChildren<GoodInfo>();
         if (getInfo != null)
         {
-            _goodList[index].AddGood(getInfo);
+            _objectsScene[index].GetGoodList.AddGood(getInfo);
         } else
         {
             if(_buttonsModes[index].GetInputFieldNumber.text.Length < _buttonsModes[index].GetInputFieldNumber.characterLimit)
@@ -259,7 +262,7 @@ public class MonitorSelectGood : MonoBehaviour
             _buttonsModes[index].GetTextError.text = "Good was added to list";
             _buttonsModes[index].GetTextError.color = Color.green;
 
-            _goodList[index].AddGood(good);
+            _objectsScene[index].GetGoodList.AddGood(good);
         } else
         {
             _buttonsModes[index].GetTextError.text = "Code does not exists";
@@ -279,12 +282,12 @@ public class MonitorSelectGood : MonoBehaviour
     {
         AfterPay(index);
         _buttonsModes[index].GetButtonLeft.interactable = false;
-        _selecterCanvas[index].SetActive(false);
+        _objectsScene[index].GetSelecterCanvas.SetActive(false);
         GameController.Instance.IsOpenedPanelUI[index] = false;
 
         if (KeyboardAndJostickController.IsJosticConnected)
         {
-            _yPanel[index].SetActive(true);
+            _objectsScene[index].GetYPanel.SetActive(true);
             GameController.Instance.IsOpenedPanelUI[index] = false;
         }
 
@@ -292,7 +295,7 @@ public class MonitorSelectGood : MonoBehaviour
         _buttonsModes[index].GetInputFieldNumber.text = null;
         _buttonsModes[index].GetButtonLeft.interactable = true;
 
-        _yPanel[index].SetActive(true);
+        _objectsScene[index].GetYPanel.SetActive(true);
         //if(GameController.Instance.IsOpenedPanelUI[index])
         //    ActiveOrDisableCanvasSelect(index);
     }
@@ -307,9 +310,25 @@ class SelectedDataJson
     public float Price { get; set; }
 
 }
+[System.Serializable]
+class MonitorSelectSceneObjectsPlayerIterrator
+{
+    [SerializeField]
+    private MonitorGoodList _goodList;
+
+    [SerializeField]
+    private GameObject _monitorSelecter, _yPanel, _selecterCanvas;
+
+    public MonitorGoodList GetGoodList => _goodList;
+    public GameObject GetMonitroSelecter => _monitorSelecter;
+    public GameObject GetYPanel => _yPanel;
+    public GameObject GetSelecterCanvas => _selecterCanvas;
+
+}
+
 
 [System.Serializable]
-class MonitorSelectPlayerIterrator
+class MonitorSelectUIPlayerIterrator
 {
     [SerializeField]
     private List<GameObject> _buttons;

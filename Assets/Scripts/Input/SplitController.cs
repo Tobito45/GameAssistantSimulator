@@ -34,7 +34,7 @@ public class SplitController : MonoBehaviour
                     camers[1].rect = new Rect(0f, 0, 0.5f, 1);
                     break;
                 case 3:
-                    camers[0].rect = new Rect(0,0.5f, 1, 0.5f);
+                    camers[0].rect = new Rect(0,0.5f, 0.5f, 0.5f);
                     camers[1].rect = new Rect(0.5f, 0f, 0.5f, 0.5f);
                     camers[2].rect = new Rect(0.5f,0.5f, 0.5f, 0.5f);
                     break;

@@ -25,12 +25,16 @@ public class ClientGenerator : MonoBehaviour
     private GameObject[] _aktualClient = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
 
     [Header("Way")]
-    public InspectorArray<Transform[]>[] wayPoints;
+    //public InspectorArray<Transform[]>[] wayPoints;
     private Transform[] _aktualTransform = new Transform[KeyboardAndJostickController.MAXPLAYERS];
     private bool _isRotating = false;
 
+    //[SerializeField]
+    //private Transform[] _spawnTransform;
+    
     [SerializeField]
-    private Transform[] _spawnTransform;
+    private ClientGeneratorPlayerIterrator[] _transformClientInfo = new ClientGeneratorPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+
 
     public event Action OnClientDestroy;
 
@@ -43,8 +47,9 @@ public class ClientGenerator : MonoBehaviour
     {
         if (_aktualClient[index] == null)
         {
-            _aktualClient[index] = Instantiate(_clientsPrefabs[UnityEngine.Random.Range(0, _clientsPrefabs.Length)], _spawnTransform[index].position, _spawnTransform[index].rotation);
-            _aktualTransform[index] = wayPoints[index].GetElements[0];
+            _aktualClient[index] = Instantiate(_clientsPrefabs[UnityEngine.Random.Range(0, _clientsPrefabs.Length)],
+                _transformClientInfo[index].GetSpawnPoint.position, _transformClientInfo[index].GetSpawnPoint.rotation);
+            _aktualTransform[index] = _transformClientInfo[index].GetWayPoints[0];
 
             activeCoroutines.Add(StartCoroutine(MoveToPlayer(_aktualClient[index], index)));
 
@@ -78,7 +83,7 @@ public class ClientGenerator : MonoBehaviour
         {
             yield return null;
         }
-        _aktualTransform[index] = wayPoints[index].GetElements[1];
+        _aktualTransform[index] = _transformClientInfo[index].GetWayPoints[1];
        
         activeCoroutines.Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
 
@@ -181,4 +186,18 @@ public class InspectorArray<T>
 
     public T GetElements => elements;
 
+}
+
+
+[System.Serializable]
+class ClientGeneratorPlayerIterrator
+{
+    [SerializeField]
+    private Transform[] _wayPoints;
+
+    [SerializeField]
+    private Transform _spawnPoint;
+
+    public Transform[] GetWayPoints => _wayPoints;
+    public Transform GetSpawnPoint => _spawnPoint;
 }

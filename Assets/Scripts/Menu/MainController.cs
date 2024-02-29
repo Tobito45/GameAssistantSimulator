@@ -16,8 +16,8 @@ public class MainController : MonoBehaviour
     [Header("Panels")]
     [SerializeField]
     private GameObject _panelMenu, _rankPanel;
-    [SerializeField]
-    private GameObject[] _panelGame;
+   // [SerializeField]
+   // private GameObject[] _panelGame;
 
     [Header("InputFields")]
     [SerializeField]
@@ -31,16 +31,14 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI textInfo;
 
-    [SerializeField]
-    private TextMeshProUGUI[] _textTimer, _textScore;
-
-    [Header("Camers")]
-    [SerializeField]
-    private Camera[] _gameCamera;
+    //[SerializeField]
+   // private TextMeshProUGUI[] _textTimer, _textScore;
 
     [SerializeField]
     private Camera _mainCamera;
 
+    [SerializeField]
+    private MainObjectsPlayerIterrator[] _playerObjects = new MainObjectsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
 
     private List<GameObject>[] _outlines = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _outLineIndex = new int[KeyboardAndJostickController.MAXPLAYERS];
@@ -63,7 +61,7 @@ public class MainController : MonoBehaviour
         GameController.Instance.SplitController.SetActiveCamers(false);
 
         _panelMenu.SetActive(true);
-        ForeachAllObjects(_panelGame, (obj) => { obj.SetActive(false); });
+        ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
 
         ActivateMenuControllingJostic(0);
     }
@@ -104,7 +102,7 @@ public class MainController : MonoBehaviour
 
     public void PlayGame()
     {
-        foreach (var text in _textScore)
+        foreach (var text in _playerObjects.Where(n => n.GetTextScore != null).Select(n => n.GetTextScore))
             text.text = "Score: 0";
         
         _mainCamera.gameObject.SetActive(false);
@@ -112,7 +110,7 @@ public class MainController : MonoBehaviour
 
         _panelMenu.SetActive(false);
         ClearMenuControllingJostic(0);
-        ForeachAllObjects(_panelGame, (obj) => { obj.SetActive(true); });
+        ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(true); });
 
     }
 
@@ -120,7 +118,7 @@ public class MainController : MonoBehaviour
     {
         for(int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++) 
         {
-            GameController.Instance.SetTextTimer(_textTimer[i], i);
+            GameController.Instance.SetTextTimer(_playerObjects[i].GetTextTimer, i);
         }
         MenuControllerJostic();
         
@@ -239,23 +237,23 @@ public class MainController : MonoBehaviour
 
     public void OnItemAdded(int index, float score, bool isPlus)
     {
-        _textScore[index].text = $"Score: {score:F2}";
-        var colourSafe = _textScore[index].color;
+        _playerObjects[index].GetTextScore.text = $"Score: {score:F2}";
+        var colourSafe = _playerObjects[index].GetTextScore.color;
         if (isPlus)
         {
-           StartCoroutine(MakeActionAfterTime(() => _textScore[index].color = Color.green,
-                                () => _textScore[index].color = colourSafe, 2));
+           StartCoroutine(MakeActionAfterTime(() => _playerObjects[index].GetTextScore.color = Color.green,
+                                () => _playerObjects[index].GetTextScore.color = colourSafe, 2));
         } else
         {
-            StartCoroutine(MakeActionAfterTime(() => _textScore[index].color = Color.red,
-                                () => _textScore[index].color = colourSafe, 2));
+            StartCoroutine(MakeActionAfterTime(() => _playerObjects[index].GetTextScore.color = Color.red,
+                                () => _playerObjects[index].GetTextScore.color = colourSafe, 2));
         }
     }
 
     public void OpenMenuAndCloseGame()
     {
         _panelMenu.SetActive(true);
-        ForeachAllObjects(_panelGame, (obj) => { obj.SetActive(false); });
+        ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
 
 
         ActivateMenuControllingJostic(0);
@@ -266,4 +264,19 @@ public class MainController : MonoBehaviour
         
     }
     public void Exit() => Application.Quit();
+}
+
+[System.Serializable]
+class MainObjectsPlayerIterrator
+{
+    [SerializeField]
+    private GameObject _panelGame;
+
+    [SerializeField]
+    private TextMeshProUGUI _textTimer, _textScore;
+
+
+    public GameObject GetPanelGame => _panelGame;
+    public TextMeshProUGUI GetTextTimer => _textTimer;
+    public TextMeshProUGUI GetTextScore => _textScore;
 }

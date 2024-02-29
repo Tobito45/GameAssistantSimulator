@@ -90,7 +90,7 @@ public class GoodsController : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < 2; i++)//TODO
+        for (int i = 0; i < 3; i++)//TODO
         {
             if (GameController.Instance.IsOpenedPanelUI[i] || _isPlayerEnded[i])
                 _UIPlayerElements[i].GetFooterPanel.SetActive(false);
@@ -158,7 +158,7 @@ public class GoodsController : MonoBehaviour
             _indexSelected[i] = -1;
         }
 
-        for (int i = 0; i < 2; i++)//TODO
+        for (int i = 0; i < 3; i++)//TODO
         {
             _UIPlayerElements[i].GetFooterPanel.SetActive(true);
         }

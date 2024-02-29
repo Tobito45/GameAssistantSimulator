@@ -14,39 +14,42 @@ public class EndMenuController : MonoBehaviour
     private const string pattern = @"\((.*?)\)";
 
     [Header("GameObjects")]
-    [SerializeField]
-    private GameObject[] _panelEnd, _panelInputName, _saveButtons;
-    [SerializeField]
-    private GameObject[] _scrollContent;
+    //[SerializeField]
+    //private GameObject[] _panelEnd, _panelInputName, _saveButtons;
+    //[SerializeField]
+   // private GameObject[] _scrollContent;
     [SerializeField]
     private GameObject _panelEndInfoPrefab;
 
-    [SerializeField]
-    private TMP_InputField[] _inputFieldsName;
-    [SerializeField]
-    private GameObject[] _warningSymbol;
+    //[SerializeField]
+    //private TMP_InputField[] _inputFieldsName;
+    //[SerializeField]
+    //private GameObject[] _warningSymbol;
 
-    [Header("Texts")]
-    [SerializeField]
-    private TextMeshProUGUI[] _textScope;
+    //[Header("Texts")]
+    //[SerializeField]
+    //private TextMeshProUGUI[] _textScope;
 
 
     [Header("Scripts")]
     [SerializeField]
     private MainController _mainController;
 
-    public bool IsEndPanelActive(int index) => _panelEnd[index].activeInHierarchy;
+    [SerializeField]
+    private EndMenuObjectsPlayerIterrator[] _objectScene = new EndMenuObjectsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+
+    public bool IsEndPanelActive(int index) => _objectScene[index].GetPanelEnd.activeInHierarchy;
 
     private void Start()
     {
-        MainController.ForeachAllObjects(_panelEnd, (obj) => obj.SetActive(false));
+        MainController.ForeachAllObjects(_objectScene.Where(n => n.GetPanelEnd != null).Select(n => n.GetPanelEnd).ToArray(), (obj) => obj.SetActive(false));
         GameController.Instance.OnStartNewGame += ClearScroll;
 
-        for (int i = 0; i < _saveButtons.Length; i++)
+        for (int i = 0; i < 3; i++) //TODO
         {
-            int index = i; 
-            _saveButtons[i].GetComponent<Button>().onClick.AddListener(() => {
-                _mainController.ActivateMenuControllingJostic(index, _panelInputName[index]);
+            int index = i;
+            _objectScene[i].GetSaveButton.GetComponent<Button>().onClick.AddListener(() => {
+                _mainController.ActivateMenuControllingJostic(index, _objectScene[index].GetPanelInputName);
             });
 
         }
@@ -54,7 +57,7 @@ public class EndMenuController : MonoBehaviour
 
     public void AddElementToEnd(int clientNumber, int countGoods, int correctGoods, float minusMoney, float plusMoney, float allSum, int index)
     {
-        var obj = Instantiate(_panelEndInfoPrefab, _scrollContent[index].transform);
+        var obj = Instantiate(_panelEndInfoPrefab, _objectScene[index].GetScrollContent.transform);
         obj.transform.Find("ClientName").GetComponent<TextMeshProUGUI>().text = $"{clientNumber:F2} - Client";
         obj.transform.Find("GoodsNumbers").GetComponent<TextMeshProUGUI>().text = $"{correctGoods:F2}/{countGoods:F2}";
         obj.transform.Find("GoodMinusPrice").GetComponent<TextMeshProUGUI>().text = $"-{minusMoney:F2}";
@@ -65,7 +68,7 @@ public class EndMenuController : MonoBehaviour
 
     public void ClearScroll()
     {
-        foreach (GameObject scroll in _scrollContent) {
+        foreach (GameObject scroll in _objectScene.Where(n => n.GetScrollContent != null).Select(n => n.GetScrollContent)) {
             foreach (Transform obj in scroll.transform)
             {
                 Destroy(obj.gameObject);
@@ -75,17 +78,17 @@ public class EndMenuController : MonoBehaviour
 
     public void ActivePanel(int index)
     {
-        _panelEnd[index].SetActive(true);
-        _mainController.ActivateMenuControllingJostic(index, _panelEnd[index]);
+        _objectScene[index].GetPanelEnd.SetActive(true);
+        _mainController.ActivateMenuControllingJostic(index, _objectScene[index].GetPanelEnd);
     }
 
     public void AktualText(float sum, int index)
     {
-        _textScope[index].text = $"Your scope: {sum.ToString("F2")}";
+        _objectScene[index].GetTextScope.text = $"Your scope: {sum.ToString("F2")}";
     }
     public void ClosePanelEnd()
     {
-        MainController.ForeachAllObjects(_panelEnd, (obj) => obj.SetActive(false));
+        MainController.ForeachAllObjects(_objectScene.Where(n => n.GetPanelEnd != null).Select(n => n.GetPanelEnd).ToArray(), (obj) => obj.SetActive(false));
         _mainController.OpenMenuAndCloseGame();
 
     }
@@ -100,7 +103,7 @@ public class EndMenuController : MonoBehaviour
             writer.WriteLine($"Saved game number{indexGame}:");
             writer.WriteLine($"Time was: {GameController.Instance.MaxTime} seconds");
 
-            foreach(Transform obj in _scrollContent[0].transform) //TODO
+            foreach(Transform obj in _objectScene[0].GetScrollContent.transform) //TODO
             {
                 writer.WriteLine("================================================");
                 writer.WriteLine($"{obj.Find("ClientName").GetComponent<TextMeshProUGUI>().text}");
@@ -120,18 +123,18 @@ public class EndMenuController : MonoBehaviour
 
     public void SaveDataInFirebase(int index)
     {
-        if (string.IsNullOrEmpty(_inputFieldsName[index].text))
+        if (string.IsNullOrEmpty(_objectScene[index].GetInputFieldName.text))
         {
             StartCoroutine(MainController.MakeActionAfterTime(
-                () => _warningSymbol[index].SetActive(true),
-                () => _warningSymbol[index].SetActive(false), 2));
+                () => _objectScene[index].GetWarningSymbol.SetActive(true),
+                () => _objectScene[index].GetWarningSymbol.SetActive(false), 2));
             return;
         }
 
-        GameController.Instance.FirebaseController.SaveUserScore(_inputFieldsName[index].text, GameController.Instance.AllSum(index), 
+        GameController.Instance.FirebaseController.SaveUserScore(_objectScene[index].GetInputFieldName.text, GameController.Instance.AllSum(index), 
                             (int)GameController.Instance.MaxTime, DateTime.Now.ToString("dd.MM.yyyy H:mm:ss"));
 
-        _panelInputName[index].SetActive(false);
+        _objectScene[index].GetPanelInputName.SetActive(false);
     }
 
   
@@ -140,4 +143,27 @@ public class EndMenuController : MonoBehaviour
         return Regex.Match(input, pattern).Groups[1].Value;
     }
 
+}
+
+[System.Serializable]
+class EndMenuObjectsPlayerIterrator
+{
+    [SerializeField]
+    private GameObject _panelEnd, _panelInputName, _saveButton;
+    [SerializeField]
+    private GameObject _scrollContent;
+    [SerializeField]
+    private TMP_InputField _inputFieldsName;
+    [SerializeField]
+    private GameObject _warningSymbol;
+    [SerializeField]
+    private TextMeshProUGUI _textScope;
+
+    public GameObject GetPanelEnd => _panelEnd;
+    public GameObject GetPanelInputName => _panelInputName;
+    public GameObject GetSaveButton => _saveButton;
+    public GameObject GetScrollContent => _scrollContent;
+    public TMP_InputField GetInputFieldName => _inputFieldsName;
+    public GameObject GetWarningSymbol => _warningSymbol;
+    public TextMeshProUGUI GetTextScope => _textScope;
 }
