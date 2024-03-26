@@ -12,7 +12,7 @@ using UnityEngine.UI;
 public class MainController : MonoBehaviour
 {
     private const float basicTime = 60f;
-
+    private const float TIMERBOARDERFORMENUITERATION = 0.2f;
     [Header("Panels")]
     [SerializeField]
     private GameObject _panelMenu, _rankPanel;
@@ -62,6 +62,8 @@ public class MainController : MonoBehaviour
 
         _panelMenu.SetActive(true);
         ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
+        ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(false); });
+        GameController.Instance.SetCityActive(true);
 
         ActivateMenuControllingJostic(0);
     }
@@ -69,22 +71,39 @@ public class MainController : MonoBehaviour
     
     public void ActivateMenuControllingJostic(int index, GameObject parent = null)
     {
-        if(parent == null)
-            _outlines[index] = FindObjectsOfType<UnityEngine.UI.Outline>().Select(g => g.gameObject).OrderBy(x => x.transform.position.y).Reverse().ToList();
-        else
-            _outlines[index] = parent.GetComponentsInChildren<UnityEngine.UI.Outline>().Select(g => g.gameObject).OrderBy(x => x.transform.position.y).Reverse().ToList();
-
-        _outLineIndex[index] = -1;
+        if (parent == null)
+        {
+            //finding all elements with component Outline
+            _outlines[index] = 
+                FindObjectsOfType<UnityEngine.UI.Outline>() 
+                .Select(g => g.gameObject)
+                .OrderBy(x => x.transform.position.y) //ordering by y coordinate
+                .Reverse()
+                .ToList();
+        }
+        else 
+        {
+            //finding all elements with component Outline from parrent
+            _outlines[index] = 
+                parent.GetComponentsInChildren<UnityEngine.UI.Outline>() 
+                    .Select(g => g.gameObject).OrderBy(x => x.transform.position.y) //ordering by y coordinate
+                    .Reverse()
+                    .ToList();
+        }
+        //reseting iterator
+        _outLineIndex[index] = -1; 
     }
 
     public void ClearMenuControllingJostic(int index)
     {
         if(_outLineIndex[index] != -1)
-            _outlines[index][_outLineIndex[index]].GetComponent<UnityEngine.UI.Outline>().enabled = false;
+            //disabling Outline component
+            _outlines[index][_outLineIndex[index]].GetComponent<UnityEngine.UI.Outline>().enabled = false; 
 
+        //clearing the list
         _outlines[index].Clear();
-        _outLineIndex[index] = -1;
-
+        //reseting iterator
+        _outLineIndex[index] = -1; 
     }
 
     public void OpenRankMenu()
@@ -111,6 +130,9 @@ public class MainController : MonoBehaviour
         _panelMenu.SetActive(false);
         ClearMenuControllingJostic(0);
         ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(true); });
+        ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(true); });
+        GameController.Instance.SetCityActive(false);
+
 
     }
 
@@ -128,61 +150,30 @@ public class MainController : MonoBehaviour
     {
         for (int index = 0; index < KeyboardAndJostickController.GetCountGamepads();index++)
         {
-            if (timer[index] < 0)
-            {
-                if ( _outlines[index].Count > 0)
-                {
-                    var vertical = KeyboardAndJostickController.GetMovement(index).vertical;
-                    if (vertical != 0)
-                    {
-                        if (_outLineIndex[index] == -1)
-                        {
-                            _outLineIndex[index] = 0;
-                        }
-                        else
-                        {
-                            _outlines[index][_outLineIndex[index]].GetComponent<UnityEngine.UI.Outline>().enabled = false;
-                            if (vertical < 0)
-                            {
-                                timer[index] = 0.2f;
-                                _outLineIndex[index]++;
-                                if (_outLineIndex[index] > _outlines[index].Count - 1)
-                                    _outLineIndex[index] = 0;
-                            }
-                            else if (vertical > 0)
-                            {
-                                timer[index] = 0.2f;
-                                _outLineIndex[index]--;
-                                if (_outLineIndex[index] < 0)
-                                    _outLineIndex[index] = _outlines[index].Count - 1;
-                            }
-
-                            _outlines[index][_outLineIndex[index]].GetComponent<UnityEngine.UI.Outline>().enabled = true;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                timer[index] -= Time.deltaTime;
-            }
+            //moving iterator
+            MovingInMenuUsingJostick(index); 
 
             if (_outLineIndex[index] != -1)
             {
                 if (KeyboardAndJostickController.GetAButton() != null && KeyboardAndJostickController.GetAButton().Contains(index))
                 {
+                    //getting selected gameobject
                     var selectedObj = _outlines[index][_outLineIndex[index]];
 
+                    //getting component Buttom
                     Button button = selectedObj.GetComponent<Button>();
-                    TMP_InputField inputField = selectedObj.GetComponentInChildren<TMP_InputField>();
+                    //getting component TMP_InputField
+                    TMP_InputField inputField = selectedObj.GetComponentInChildren<TMP_InputField>(); 
                     if (button)
                     {
-                        button.onClick.Invoke();
+                        //execution of button method
+                        button.onClick.Invoke(); 
                     }
                     else if (inputField)
                     {
                         if (inputField.contentType == TMP_InputField.ContentType.IntegerNumber)
-                            inputField.text = (int.Parse(inputField.text) + 1).ToString();
+                            //increasing inputfield value
+                            inputField.text = (int.Parse(inputField.text) + 1).ToString(); 
                         else
                         {
                             int saveIndex = index;
@@ -196,7 +187,7 @@ public class MainController : MonoBehaviour
                             ClearMenuControllingJostic(index);
                             GameController.Instance.KeyBoardForJostic.OnSelected[index] += (c) =>
                             {
-                                if (c == 'D')
+                                if (c == 'D' && inputField.text.Length > 0)
                                 {
                                     inputField.text = inputField.text.Substring(0, inputField.text.Length - 1);
                                 }
@@ -207,18 +198,68 @@ public class MainController : MonoBehaviour
                 }
                 else if (KeyboardAndJostickController.GetBButton() != null && KeyboardAndJostickController.GetBButton().Contains(0))
                 {
+                    //getting selected gameobject
                     var selectedObj = _outlines[index][_outLineIndex[index]];
+                    //getting component TMP_InputField
                     TMP_InputField inputField = selectedObj.GetComponentInChildren<TMP_InputField>();
-
                     if (inputField)
                     {
                         if (inputField.contentType == TMP_InputField.ContentType.IntegerNumber)
-                            inputField.text = (int.Parse(inputField.text) - 1).ToString();
+                            //decreasing inputfield value
+                            inputField.text = (int.Parse(inputField.text) - 1).ToString(); 
 
                     }
                 }
             }
         }
+    }
+
+    private void MovingInMenuUsingJostick(int index)
+    {
+        if (timer[index] < 0)
+        {
+            if (_outlines[index].Count > 0)
+            {
+                //moving of stick
+                var vertical = KeyboardAndJostickController.GetMovement(index).vertical; 
+                if (vertical != 0)
+                {
+                    if (_outLineIndex[index] == -1)
+                    {
+                        //setting to first value of list
+                        _outLineIndex[index] = 0; 
+                    }
+                    else
+                    {
+                        //disabling Outline
+                        _outlines[index][_outLineIndex[index]].GetComponent<UnityEngine.UI.Outline>().enabled = false;
+                        if (vertical < 0)
+                        {
+                            //setting limit to timer
+                            timer[index] = TIMERBOARDERFORMENUITERATION;
+                            //increasing iterrator
+                            _outLineIndex[index]++; 
+                            if (_outLineIndex[index] > _outlines[index].Count - 1)
+                                _outLineIndex[index] = 0;
+                        }
+                        else if (vertical > 0)
+                        {
+                            //setting limit to timer 
+                            timer[index] = TIMERBOARDERFORMENUITERATION;
+                            //decreasing iterrator
+                            _outLineIndex[index]--; 
+                            if (_outLineIndex[index] < 0)
+                                _outLineIndex[index] = _outlines[index].Count - 1;
+                        }
+                        //enabling Outline
+                        _outlines[index][_outLineIndex[index]].GetComponent<UnityEngine.UI.Outline>().enabled = true;
+                    }
+                }
+            }
+        }
+        else
+            // decreasing timer by real time
+            timer[index] -= Time.deltaTime; 
     }
 
     public static void ForeachAllObjects<T>(T[] objects, Action<T> action)
@@ -254,12 +295,15 @@ public class MainController : MonoBehaviour
     {
         _panelMenu.SetActive(true);
         ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
+        ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(false); });
+        GameController.Instance.SetCityActive(true);
 
 
         ActivateMenuControllingJostic(0);
         
 
         GameController.Instance.SplitController.SetActiveCamers(false);
+
         _mainCamera.gameObject.SetActive(true);
         
     }
@@ -270,6 +314,9 @@ public class MainController : MonoBehaviour
 class MainObjectsPlayerIterrator
 {
     [SerializeField]
+    private GameObject _canvasGame;
+
+    [SerializeField]
     private GameObject _panelGame;
 
     [SerializeField]
@@ -277,6 +324,7 @@ class MainObjectsPlayerIterrator
 
 
     public GameObject GetPanelGame => _panelGame;
+    public GameObject GetCanvasPanel => _canvasGame;
     public TextMeshProUGUI GetTextTimer => _textTimer;
     public TextMeshProUGUI GetTextScore => _textScore;
 }

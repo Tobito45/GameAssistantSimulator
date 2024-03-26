@@ -179,18 +179,26 @@ public class DragObject : MonoBehaviour
 
         if (_qCodeObject != null && _good.IsScaned == false && !HasQrCode)
         {
+            //getting coordinates of code object
             Vector3 rayOrigin = _qCodeObject.transform.position;
+            //getting direction of code object
             Vector3 rayDirection = _qCodeObject.transform.up;
 
+            //creating raycast
             Ray ray = new Ray(rayOrigin, rayDirection);
+            //creating hit of the raycast
             RaycastHit hit;
+            //debugging
             Debug.DrawRay(rayOrigin, rayDirection, Color.red);
-            if (Physics.Raycast(ray, out hit))
+            //getting hit of first object
+            if (Physics.Raycast(ray, out hit)) 
             {
-                GameObject hitObject = hit.collider.gameObject;
+                //getting hit gameobject
+                GameObject hitObject = hit.collider.gameObject; 
 
                 if (hitObject.name == "RedDetecter")
-                    GameController.Instance.QCodeDetecter.DetectGood(_good, Index);
+                    //scanning the good
+                    GameController.Instance.QCodeDetecter.DetectGood(_good, Index); 
             }
         }
     }

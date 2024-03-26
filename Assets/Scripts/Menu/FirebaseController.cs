@@ -22,7 +22,7 @@ public class FirebaseController : MonoBehaviour
     [SerializeField]
     private GameObject _prefabInfoGameObject;
 
-    private int _typeOfSort = -1; // 0 - by name, 1 - by score, 2 - by time, 3 - by date
+    private TypeColumnFilter _typeOfSort = TypeColumnFilter.None;
     private int _koefFilterRemoved = 0;
     private TypeDateFilter _filterDate = TypeDateFilter.All;
     public void SetTypeOfSorting(int i)
@@ -32,12 +32,12 @@ public class FirebaseController : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        if (_typeOfSort == i)
+        if (_typeOfSort == (TypeColumnFilter)i)
         {
-            _typeOfSort = -1;
+            _typeOfSort = TypeColumnFilter.None;
             return;
         }
-        _typeOfSort = i;
+        _typeOfSort = (TypeColumnFilter)i;
     }
 
     public void ChangeFilterDate(int type)
@@ -96,20 +96,19 @@ public class FirebaseController : MonoBehaviour
     {
         switch (_typeOfSort)
         {
-            case -1:
+            case TypeColumnFilter.None:
                 break;
-
-            case 0:
-                userData = userData.OrderBy(n => n.username).ToList();
+            case TypeColumnFilter.Name:
+                userData.Sort((n1, n2) => string.Compare(n1.username, n2.username)); 
                 break;
-            case 1:
-                userData = userData.OrderBy(n => n.score).Reverse().ToList();
+            case TypeColumnFilter.Score:
+                userData.Sort((n1, n2) => n2.score.CompareTo(n1.score));
                 break;
-            case 2:
-                userData = userData.OrderBy(n => n.time).Reverse().ToList();
+            case TypeColumnFilter.Time:
+                userData.Sort((n1, n2) => n2.time.CompareTo(n1.time));
                 break;
-            case 3:
-                userData = userData.OrderBy(n => n.date).Reverse().ToList();
+            case TypeColumnFilter.Date:
+                userData.Sort((n1, n2) => DateTime.Compare(DateTime.Parse(n2.date), DateTime.Parse(n1.date)));
                 break;
         }
     }
@@ -118,18 +117,19 @@ public class FirebaseController : MonoBehaviour
     {
         int saveCount = userData.Count;
         List<UserData> savedUserData = null;
-
         switch (_filterDate)
         {
             case TypeDateFilter.All:
                 savedUserData = new List<UserData>(userData);
                 break;
             case TypeDateFilter.Today:
-                savedUserData = userData.Where(n => DateTime.ParseExact(n.date, "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture).Date == DateTime.Today).ToList();
+                savedUserData = userData.Where(n => DateTime.ParseExact(n.date, "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture).Date == DateTime.Today)
+                    .ToList();
                 break;
             case TypeDateFilter.Week:
                 savedUserData = userData.Where((n) =>
                 {
+                    //Calculation the day of week
                     DateTime dateToCheck = DateTime.ParseExact(n.date, "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture).Date;
                     DayOfWeek dayOfWeek = dateToCheck.DayOfWeek;
                     DateTime startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
@@ -140,12 +140,14 @@ public class FirebaseController : MonoBehaviour
             case TypeDateFilter.Month:
                 savedUserData = userData.Where((n) =>
                 {
+                    //Calculation the month of year
                     DateTime dateToCheck = DateTime.ParseExact(n.date, "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture).Date;
                     return dateToCheck.Month == DateTime.Today.Month && dateToCheck.Year == DateTime.Today.Year;
                 }).ToList();
                 break;
             case TypeDateFilter.Year:
-                savedUserData = userData.Where(n => DateTime.ParseExact(n.date, "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture).Year == DateTime.Today.Year).ToList();
+                savedUserData = userData.Where(n => DateTime.ParseExact(n.date, "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture).Year
+                        == DateTime.Today.Year).ToList();
                 break;
         }
         _koefFilterRemoved = saveCount - userData.Count;
@@ -157,21 +159,24 @@ public class FirebaseController : MonoBehaviour
         if (_content.transform.childCount + _koefFilterRemoved == _usersData.Count)
             return;
 
-        foreach (Transform child in _content.transform)
-        {
+        //clearing already existing list of date
+        foreach (Transform child in _content.transform) 
             Destroy(child.gameObject);
-        }
 
+        //filtering by name/score/time/date
         MakeDictionarySorted(ref _usersData);
-        var dateFilteredData = MakeDictionaryNecessaryDate(_usersData);
-        foreach (var userData in dateFilteredData)
+
+        //filtering by time period
+        var dateFilteredData = MakeDictionaryNecessaryDate(_usersData); 
+
+        //createting new one
+        foreach (var userData in dateFilteredData) 
         {
             var obj = Instantiate(_prefabInfoGameObject, _content.transform);
             obj.transform.Find("TextName").GetComponent<TextMeshProUGUI>().text = userData.username;
             obj.transform.Find("TextScore").GetComponent<TextMeshProUGUI>().text = userData.score.ToString("F2");
             obj.transform.Find("TextMaxTime").GetComponent<TextMeshProUGUI>().text = userData.time.ToString();
             obj.transform.Find("TextDate").GetComponent<TextMeshProUGUI>().text = userData.date.ToString();
-            //Debug.Log("UserID: " + userData.Key + ", Username: " + userData.Value.username + ", Score: " + userData.Value.score + ", Time: " + userData.Value.time + ", Date: " + userData.Value.date);
         }
     }
 }
@@ -198,4 +203,10 @@ public class UserData
 public enum TypeDateFilter
 {
     Today, Week, Month, Year, All
+}
+
+[System.Serializable]
+public enum TypeColumnFilter
+{
+    None = -1, Name = 0, Score = 1, Time = 2, Date = 3
 }

@@ -119,7 +119,6 @@ public class MonitorSelectGood : MonoBehaviour
                 if (!GameController.Instance.IsOpenedPanelUI[index])
                     continue;
 
-                //_buttonAccept[index].onClick.Invoke();
                 _buttonsModes[index].GetButtonRight.onClick.Invoke();
             }
 
@@ -129,7 +128,6 @@ public class MonitorSelectGood : MonoBehaviour
                 if (!GameController.Instance.IsOpenedPanelUI[index])
                     continue;
 
-                // _buttonPay[index].onClick.Invoke();
                 _buttonsModes[index].GetButtonLeft.onClick.Invoke();
             }
 
@@ -142,10 +140,13 @@ public class MonitorSelectGood : MonoBehaviour
                         ActiveOrDisableCanvasSelect(index);
                 }
 
+                //getting everyone who pressed Y
                 foreach (int index in KeyboardAndJostickController.GetYButton())
                 {
+                    //check if the product selection panel can be activated
                     if (!_objectsScene[index].GetSelecterCanvas.activeInHierarchy)
-                        ActiveOrDisableCanvasSelect(index);
+                        //activation of the product selection panel
+                        ActiveOrDisableCanvasSelect(index); 
                 }
             }
 
@@ -310,6 +311,7 @@ class SelectedDataJson
     public float Price { get; set; }
 
 }
+
 [System.Serializable]
 class MonitorSelectSceneObjectsPlayerIterrator
 {
@@ -334,19 +336,14 @@ class MonitorSelectUIPlayerIterrator
     private List<GameObject> _buttons;
     [SerializeField]
     private List<Button> _buttonLeft, _buttonRight;
-
     [SerializeField]
     private List<GameObject> _contents;
-
     [SerializeField]
     private List<int> _koeficentScroll;
-
     [SerializeField]
     private TMP_InputField _inputNumber;
-
     [SerializeField]
     private TextMeshProUGUI _textError;
-
     private int _iterator = -1;
 
     public Button NextButton()
@@ -354,7 +351,6 @@ class MonitorSelectUIPlayerIterrator
         _iterator++;
         if (_iterator >= _buttons.Count)
             _iterator = 0;
-
         return _buttons[_iterator].GetComponent<Button>();
     }
     public TMP_InputField GetInputFieldNumber => _inputNumber;
@@ -367,12 +363,10 @@ class MonitorSelectUIPlayerIterrator
     public List<GameObject> GetObjectsToIterate()
     {
         List<GameObject> objectsToIterate = new List<GameObject>();
-
         Transform currentTransform = _contents[_iterator].transform;
         int childCount = currentTransform.childCount;
         for (int i = 0; i < childCount; i++)
             objectsToIterate.Add(currentTransform.GetChild(i).gameObject);
-
         return objectsToIterate;
     }
 }

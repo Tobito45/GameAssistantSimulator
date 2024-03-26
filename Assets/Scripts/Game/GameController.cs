@@ -35,6 +35,10 @@ public class GameController : MonoBehaviour
     
     [SerializeField]
     private InputKeyboardController _keyboardForJostic;
+
+    [SerializeField]
+    private GameObject _city;
+
     public bool IsTimerEnded() => _timer < 0;
 
     public float MaxTime => _maxTime;
@@ -111,6 +115,8 @@ public class GameController : MonoBehaviour
             NextGenerete(i);
         }
     }
+
+    public void SetCityActive(bool status) => _city.SetActive(status); 
 
     public void NextGenerete(int index)
     {

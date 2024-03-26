@@ -130,12 +130,14 @@ public class KeyboardAndJostickController : MonoBehaviour
 
     public static IEnumerable<int> GetYButton()
     {
+        //creating list of indexes
         var list = new List<int>();
+        //selecting of indexes
         list = Gamepad.all
                .Select((gamepad, index) => (gamepad, index))
                .Where(x => x.gamepad.yButton.wasPressedThisFrame)
                .Select(x => x.index)
-               .ToList();
+               .ToList(); 
 
         return list;
     }

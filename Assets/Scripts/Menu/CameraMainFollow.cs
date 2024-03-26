@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CameraMainFollow : MonoBehaviour
 {
-    private const float rotationSpeed = 5f;
+    private const float rotationSpeed = 15f;
     private readonly Vector3 rotationAxis = Vector3.up;
 
     [SerializeField]
