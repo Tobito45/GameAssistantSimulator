@@ -53,7 +53,7 @@ public class MonitorSelectGood : MonoBehaviour
         string jsonFile = json.ToString();
         SelectedDataJson[] dataObject = JsonConvert.DeserializeObject<SelectedDataJson[]>(jsonFile);
 
-        for (int i = 0; i < 3; i++) //TODO
+        for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
             foreach (var item in dataObject)
             {
@@ -89,9 +89,10 @@ public class MonitorSelectGood : MonoBehaviour
 
     private void Update()
     {
+
         foreach (int index in KeyboardAndJostickController.SelectNextGoodOnMonitor())
         {
-            if (!GameController.Instance.IsOpenedPanelUI[index])
+            if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                 continue;
 
             NextObjectSelect(index);
@@ -100,7 +101,7 @@ public class MonitorSelectGood : MonoBehaviour
 
         foreach (int index in KeyboardAndJostickController.ConfirmPayment())
         {
-            if (!GameController.Instance.IsOpenedPanelUI[index])
+            if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                 continue;
 
             //_buttonPay[index].onClick.Invoke();
@@ -116,7 +117,7 @@ public class MonitorSelectGood : MonoBehaviour
         {
             foreach (int index in KeyboardAndJostickController.GetAButton())
             {
-                if (!GameController.Instance.IsOpenedPanelUI[index])
+                if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                     continue;
 
                 _buttonsModes[index].GetButtonRight.onClick.Invoke();
@@ -125,7 +126,7 @@ public class MonitorSelectGood : MonoBehaviour
 
             foreach (int index in KeyboardAndJostickController.GetYButton())
             {
-                if (!GameController.Instance.IsOpenedPanelUI[index])
+                if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                     continue;
 
                 _buttonsModes[index].GetButtonLeft.onClick.Invoke();
@@ -136,7 +137,7 @@ public class MonitorSelectGood : MonoBehaviour
 
                 foreach (int index in KeyboardAndJostickController.GetBButton())
                 {
-                    if (_objectsScene[index].GetSelecterCanvas.activeInHierarchy)
+                    if (_objectsScene[index].GetSelecterCanvas.activeInHierarchy && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                         ActiveOrDisableCanvasSelect(index);
                 }
 
@@ -144,7 +145,7 @@ public class MonitorSelectGood : MonoBehaviour
                 foreach (int index in KeyboardAndJostickController.GetYButton())
                 {
                     //check if the product selection panel can be activated
-                    if (!_objectsScene[index].GetSelecterCanvas.activeInHierarchy)
+                    if (!_objectsScene[index].GetSelecterCanvas.activeInHierarchy && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                         //activation of the product selection panel
                         ActiveOrDisableCanvasSelect(index); 
                 }
@@ -152,7 +153,7 @@ public class MonitorSelectGood : MonoBehaviour
 
             foreach (int index in KeyboardAndJostickController.GetButtonLT())
             {
-                if (!GameController.Instance.IsOpenedPanelUI[index])
+                if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                     continue;
 
                 ActivaeButtonModeWithIterator(index);

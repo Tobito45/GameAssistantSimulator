@@ -14,22 +14,8 @@ public class EndMenuController : MonoBehaviour
     private const string pattern = @"\((.*?)\)";
 
     [Header("GameObjects")]
-    //[SerializeField]
-    //private GameObject[] _panelEnd, _panelInputName, _saveButtons;
-    //[SerializeField]
-   // private GameObject[] _scrollContent;
     [SerializeField]
     private GameObject _panelEndInfoPrefab;
-
-    //[SerializeField]
-    //private TMP_InputField[] _inputFieldsName;
-    //[SerializeField]
-    //private GameObject[] _warningSymbol;
-
-    //[Header("Texts")]
-    //[SerializeField]
-    //private TextMeshProUGUI[] _textScope;
-
 
     [Header("Scripts")]
     [SerializeField]
@@ -45,7 +31,7 @@ public class EndMenuController : MonoBehaviour
         MainController.ForeachAllObjects(_objectScene.Where(n => n.GetPanelEnd != null).Select(n => n.GetPanelEnd).ToArray(), (obj) => obj.SetActive(false));
         GameController.Instance.OnStartNewGame += ClearScroll;
 
-        for (int i = 0; i < 3; i++) //TODO
+        for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
             int index = i;
             _objectScene[i].GetSaveButton.GetComponent<Button>().onClick.AddListener(() => {

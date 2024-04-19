@@ -20,7 +20,6 @@ public class GoodsController : MonoBehaviour
     private DragObject[] _goodSelected = new DragObject[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _indexSelected = new int[KeyboardAndJostickController.MAXPLAYERS];
 
-    private bool[] _isPlayerEnded = new bool[KeyboardAndJostickController.MAXPLAYERS];
     private bool[] _lockAutoPay = new bool[KeyboardAndJostickController.MAXPLAYERS];
 
     [SerializeField]
@@ -38,16 +37,14 @@ public class GoodsController : MonoBehaviour
             _monitorSelectGood.AfterPay += AfterPayLocker;
         }
 
-        MainController.ForeachAllObjects(_isPlayerEnded, (x) => x = false);
         GameController.Instance.OnStartNewGame += ClearList;
-        //GameController.Instance.OnEndGame += OnEndGame;
     }
 
     private void Update()
     {
         foreach (int index in KeyboardAndJostickController.MoveGoodsConveyon())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
                 continue;
 
             foreach (GameObject good in _goodsOnConveer[index])//[0])
@@ -59,14 +56,14 @@ public class GoodsController : MonoBehaviour
 
         foreach (int index in KeyboardAndJostickController.ChangeGoods())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
                 continue;
             IndexSelectedItemPlus(index);
         }
 
         foreach (int index in KeyboardAndJostickController.TakeGood())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
                 continue;
 
             if (_indexSelected[index] != -1)
@@ -78,26 +75,29 @@ public class GoodsController : MonoBehaviour
 
         foreach (int index in KeyboardAndJostickController.LetsGoGood())
         {
-            if (GameController.Instance.IsOpenedPanelUI[index] || _isPlayerEnded[index])
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
                 continue;
 
             _goodSelected[index] = null;
         }
 
-        if(!KeyboardAndJostickController.IsJosticConnected)
-        {
-            _UIPlayerElements[0].GetFooterPanel.SetActive(false);
-            return;
-        }
+        
 
-        for (int i = 0; i < 3; i++)//TODO
+
+        for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
-            if (GameController.Instance.IsOpenedPanelUI[i] || _isPlayerEnded[i])
+            if (!KeyboardAndJostickController.IsJosticConnected)
+            {
+                _UIPlayerElements[i].TabPanelLetsGo.SetActive(false);
+                _UIPlayerElements[i].TabPanelPick.SetActive(false);
+            }
+
+            if (GameController.Instance.IsOpenedPanelUI[i] || GameController.Instance.EndMenuController.IsEndPanelActive(i))
                 _UIPlayerElements[i].GetFooterPanel.SetActive(false);
             else
                 _UIPlayerElements[i].GetFooterPanel.SetActive(true);
 
-            if (_goodSelected[i] != null)
+            if (_goodSelected[i] != null || Input.GetMouseButton(0))
             {
                 _UIPlayerElements[i].GetLetGoPanel.SetActive(true);
                 _UIPlayerElements[i].GetPickPanel.SetActive(false);
@@ -158,7 +158,7 @@ public class GoodsController : MonoBehaviour
             _indexSelected[i] = -1;
         }
 
-        for (int i = 0; i < 3; i++)//TODO
+        for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
             _UIPlayerElements[i].GetFooterPanel.SetActive(true);
         }
@@ -235,7 +235,6 @@ public class GoodsController : MonoBehaviour
 
     private void OnEndGame(int index) {
         _UIPlayerElements[index].GetFooterPanel.SetActive(false);
-        _isPlayerEnded[index] = true;
     }
 }
 
@@ -247,10 +246,14 @@ class GoodsPlayerIterrator
     private Transform _pointerCreate;
 
     [SerializeField]
-    private GameObject _footerPanel, _pickPanel, _letGoPanel;
+    private GameObject _footerPanel, _pickPanel, _letGoPanel, _tabPanelLetsGo, _tabPanelPick;
+
+
 
     public Transform GetPointCreate => _pointerCreate;
     public GameObject GetFooterPanel => _footerPanel;
     public GameObject GetPickPanel => _pickPanel;
     public GameObject GetLetGoPanel => _letGoPanel;
+    public GameObject TabPanelLetsGo => _tabPanelLetsGo;
+    public GameObject TabPanelPick => _tabPanelPick;
 }

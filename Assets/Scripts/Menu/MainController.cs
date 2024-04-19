@@ -190,8 +190,8 @@ public class MainController : MonoBehaviour
                                 if (c == 'D' && inputField.text.Length > 0)
                                 {
                                     inputField.text = inputField.text.Substring(0, inputField.text.Length - 1);
-                                }
-                                inputField.text += c.ToString();
+                                } else 
+                                    inputField.text += c.ToString();
                             };
                         }
                     }

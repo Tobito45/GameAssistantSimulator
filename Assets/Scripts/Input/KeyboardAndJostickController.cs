@@ -46,13 +46,6 @@ public class KeyboardAndJostickController : MonoBehaviour
         else
         {
             return (-Gamepad.all[index].leftStick.ReadValue().x, Gamepad.all[index].leftStick.ReadValue().y);
-            // var list = new List<(float horizontal, float vertical)>();
-            // list = Gamepad.all
-            //        .Select((gamepad, index) => (gamepad, index))
-            //        .Select(x => (-x.gamepad.leftStick.ReadValue().x, -x.gamepad.leftStick.ReadValue().y))
-            //        .ToList();
-
-            // return list;
         }
 
     }
@@ -70,24 +63,38 @@ public class KeyboardAndJostickController : MonoBehaviour
     public static IEnumerable<int> GetUpButton()
     {
         var list = new List<int>();
-        list = Gamepad.all
-               .Select((gamepad, index) => (gamepad, index))
-               .Where(x => x.gamepad.dpad.up.isPressed)
-               .Select(x => x.index)
-               .ToList();
-
+        if (IsJosticConnected)
+        {
+            list = Gamepad.all
+                   .Select((gamepad, index) => (gamepad, index))
+                   .Where(x => x.gamepad.dpad.up.isPressed)
+                   .Select(x => x.index)
+                   .ToList();
+        }
+        else
+        {
+            if (Input.GetAxis("Mouse ScrollWheel") > 0)
+                list.Add(0);
+        }
         return list;
     }
 
     public static IEnumerable<int> GetDownButton()
     {
         var list = new List<int>();
-        list = Gamepad.all
+        if (IsJosticConnected)
+        {
+            list = Gamepad.all
                .Select((gamepad, index) => (gamepad, index))
                .Where(x => x.gamepad.dpad.down.isPressed)
                .Select(x => x.index)
                .ToList();
-
+        }
+        else
+        {
+            if (Input.GetAxis("Mouse ScrollWheel") < 0)
+                list.Add(0);
+        }
         return list;
     }
 
@@ -137,7 +144,7 @@ public class KeyboardAndJostickController : MonoBehaviour
                .Select((gamepad, index) => (gamepad, index))
                .Where(x => x.gamepad.yButton.wasPressedThisFrame)
                .Select(x => x.index)
-               .ToList(); 
+               .ToList();
 
         return list;
     }

@@ -11,8 +11,8 @@ public class ClientGenerator : MonoBehaviour
     private const float timeBetween = 0.1f;
     private const float timeToWait = 2;
 
-    private List<Coroutine> activeCoroutines = new List<Coroutine>();
-    private Coroutine lastCoroutine;
+    private List<Coroutine>[] activeCoroutines = new List<Coroutine>[KeyboardAndJostickController.MAXPLAYERS];
+    private Coroutine[] lastCoroutine = new Coroutine[KeyboardAndJostickController.MAXPLAYERS];
 
     [Header("Monitor")]
     [SerializeField]
@@ -41,6 +41,11 @@ public class ClientGenerator : MonoBehaviour
     private void Start()
     {
         _goods.AfterPay += ClientPayed;
+
+        for (int i = 0; i < activeCoroutines.Length; i++)
+        {
+            activeCoroutines[i] = new List<Coroutine>();
+        }
     }
 
     public void SpawnClient(int index)
@@ -51,14 +56,14 @@ public class ClientGenerator : MonoBehaviour
                 _transformClientInfo[index].GetSpawnPoint.position, _transformClientInfo[index].GetSpawnPoint.rotation);
             _aktualTransform[index] = _transformClientInfo[index].GetWayPoints[0];
 
-            activeCoroutines.Add(StartCoroutine(MoveToPlayer(_aktualClient[index], index)));
+            activeCoroutines[index].Add(StartCoroutine(MoveToPlayer(_aktualClient[index], index)));
 
         }
     }
 
     private IEnumerator MoveToPlayer(GameObject client, int index)
     {
-        activeCoroutines.Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
+        activeCoroutines[index].Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
 
         if (client.GetComponent<Animator>() != null)
         {
@@ -71,25 +76,25 @@ public class ClientGenerator : MonoBehaviour
         {
             yield return new WaitForSeconds(timeToWait);
         }
-        activeCoroutines.Add(StartCoroutine(RotateToTargetAngle(client, targetWalk)));
+        activeCoroutines[index].Add(StartCoroutine(RotateToTargetAngle(client, targetWalk)));
 
 
     }
 
     private IEnumerator MoveToOutSide(GameObject client, int index)
     {
-        activeCoroutines.Add(StartCoroutine(RotateToTargetAngle(client, targetOut)));
+        activeCoroutines[index].Add(StartCoroutine(RotateToTargetAngle(client, targetOut)));
         while (_isRotating)
         {
             yield return null;
         }
         _aktualTransform[index] = _transformClientInfo[index].GetWayPoints[1];
        
-        activeCoroutines.Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
+        activeCoroutines[index].Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
 
-        if (client.GetComponent<Animator>() != null)
+        if (client != null && client.GetComponent<Animator>() != null)
         {
-            while (client.GetComponent<Animator>().GetBool("Walk"))
+            while ( client.GetComponent<Animator>().GetBool("Walk"))
             {
                 yield return null;
             }
@@ -99,14 +104,14 @@ public class ClientGenerator : MonoBehaviour
         }
         Destroy(client);
         yield return new WaitForSeconds(timeBetween);
-        StopAllCoroutinesExceptCurrent();
+        StopAllCoroutinesExceptCurrent(index);
         GameController.Instance.NextGenerete(index);
-        StopCoroutine(lastCoroutine);
+        StopCoroutine(lastCoroutine[index]);
     }
 
     private IEnumerator MoveToTarget(GameObject objToMove, Transform target, int index)
     {
-        if(_aktualClient[index].GetComponent<Animator>() != null)
+        if(_aktualClient[index] != null && _aktualClient[index].GetComponent<Animator>() != null)
             _aktualClient[index].GetComponent<Animator>().SetBool("Walk", true);
         Vector3 startPosition = objToMove.transform.position;
         float elapsedTime = 0f;
@@ -158,9 +163,9 @@ public class ClientGenerator : MonoBehaviour
         objectRotate.transform.rotation = targetRotation;
         _isRotating = false;
     }
-    private void StopAllCoroutinesExceptCurrent()
+    private void StopAllCoroutinesExceptCurrent(int index)
     {
-        foreach (Coroutine coroutine in activeCoroutines)
+        foreach (Coroutine coroutine in activeCoroutines[index])
         {
             if (coroutine != null)
             {
@@ -168,13 +173,13 @@ public class ClientGenerator : MonoBehaviour
             }
         }
 
-        activeCoroutines.Clear(); // Очистка списка активных корутин
+        activeCoroutines[index].Clear(); // Очистка списка активных корутин
     }
 
     public void ClientPayed(int index)
     {
         if (_aktualClient[index] != null)
-            lastCoroutine = StartCoroutine(MoveToOutSide(_aktualClient[index], index));
+            lastCoroutine[index] = StartCoroutine(MoveToOutSide(_aktualClient[index], index));
     }
 }
 
