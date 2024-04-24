@@ -45,7 +45,6 @@ public class GameCameraController : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
         if (_gameWasEnd == true || GameController.Instance.MainController.IsMenu || GameController.Instance.IsOpenedPanelUI[_index])
             return;
 

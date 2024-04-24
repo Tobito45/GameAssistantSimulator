@@ -13,20 +13,23 @@ public class TutorialChangerImages : MonoBehaviour
 
     private Image _image;
 
-    [SerializeField]
-    private bool testic;
-    // Start is called before the first frame update
     void Awake()
     {
         _image = GetComponent<Image>(); 
-        GameController.Instance.OnStartNewGame += OnChangeImage;
     }
 
-    private void OnChangeImage()
+    private void OnEnable()
     {
-        if(KeyboardAndJostickController.IsJosticConnected)
+        if (KeyboardAndJostickController.IsJosticConnected)
             _image.sprite = _josticImage;
         else
+        {
             _image.sprite = _keyBoardImage;
+        }
+
+        if (_image.sprite == null)
+            _image.color = new Color(1, 1, 1, 0);
+        else
+            _image.color = new Color(1, 1, 1, 1f);
     }
 }

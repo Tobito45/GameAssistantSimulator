@@ -441,7 +441,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: 76509ccbf43b3a94ea3154f298ce3189, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: 3a18aa101bd438b4b8904920f47e477e, type: 3}
-  testic: 0
 --- !u!1 &913440359194974634
 GameObject:
   m_ObjectHideFlags: 0
@@ -533,7 +532,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: 76509ccbf43b3a94ea3154f298ce3189, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: 3a18aa101bd438b4b8904920f47e477e, type: 3}
-  testic: 1
 --- !u!1 &1195199537535470661
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,7 +780,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: d06ee2a6dd527fb4783f1f91c23a917f, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: 9c60eeddcb9975a4682f6bf713052e41, type: 3}
-  testic: 0
 --- !u!1 &1723800468315398387
 GameObject:
   m_ObjectHideFlags: 0
@@ -1693,7 +1690,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: 1b37227615b2bb44eaca171d6844ee88, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: 57eaf2e8f41853640921b4f27b2b97d4, type: 3}
-  testic: 0
 --- !u!1 &3148294463206676413
 GameObject:
   m_ObjectHideFlags: 0
@@ -2274,7 +2270,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: 07f707c4170c3e74b805e76d2e4d9807, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: 9c60eeddcb9975a4682f6bf713052e41, type: 3}
-  testic: 0
 --- !u!1 &4288763155656360313
 GameObject:
   m_ObjectHideFlags: 0
@@ -3688,6 +3683,7 @@ GameObject:
   - component: {fileID: 4288763156156973670}
   - component: {fileID: 4288763156156973668}
   - component: {fileID: 4288763156156973671}
+  - component: {fileID: 3046634819745864827}
   m_Layer: 0
   m_Name: Image_Y
   m_TagString: Untagged
@@ -3753,6 +3749,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3046634819745864827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4288763156156973673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9888916fb42f3847922b67137218369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _josticImage: {fileID: 21300000, guid: 2ce5ef5051da3b045b61b98e01c9d490, type: 3}
+  _keyBoardImage: {fileID: 0}
 --- !u!1 &4288763156283882747
 GameObject:
   m_ObjectHideFlags: 0
@@ -3764,6 +3774,7 @@ GameObject:
   - component: {fileID: 4288763156283882744}
   - component: {fileID: 4288763156283882742}
   - component: {fileID: 4288763156283882745}
+  - component: {fileID: 7143284045334333530}
   m_Layer: 0
   m_Name: Image_B
   m_TagString: Untagged
@@ -3829,6 +3840,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7143284045334333530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4288763156283882747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9888916fb42f3847922b67137218369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _josticImage: {fileID: 21300000, guid: 07f707c4170c3e74b805e76d2e4d9807, type: 3}
+  _keyBoardImage: {fileID: 0}
 --- !u!1 &4288763156382365979
 GameObject:
   m_ObjectHideFlags: 0
@@ -4410,6 +4435,7 @@ GameObject:
   - component: {fileID: 4288763156659167972}
   - component: {fileID: 4288763156659167975}
   - component: {fileID: 4288763156659167974}
+  - component: {fileID: 2688711784649356264}
   m_Layer: 0
   m_Name: Scroll View
   m_TagString: Untagged
@@ -4508,6 +4534,23 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2688711784649356264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4288763156659167976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb44dc5293b75754995743f02432233f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _index: -1
+  _horizontalScrollBar: {fileID: 4288763156793516558}
+  _vericalScrollBar: {fileID: 4288763156536838138}
+  _speed: 2
+  _controllWithStics: 1
 --- !u!1 &4288763156756939256
 GameObject:
   m_ObjectHideFlags: 0
@@ -4882,7 +4925,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4288763157166218202}
   m_HandleRect: {fileID: 4288763157166218205}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -5063,6 +5106,7 @@ GameObject:
   - component: {fileID: 4288763156824262100}
   - component: {fileID: 4288763156824262098}
   - component: {fileID: 4288763156824262101}
+  - component: {fileID: 8345750759306977131}
   m_Layer: 0
   m_Name: Image_A
   m_TagString: Untagged
@@ -5128,6 +5172,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8345750759306977131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4288763156824262103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9888916fb42f3847922b67137218369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _josticImage: {fileID: 21300000, guid: d06ee2a6dd527fb4783f1f91c23a917f, type: 3}
+  _keyBoardImage: {fileID: 0}
 --- !u!1 &4288763156829090000
 GameObject:
   m_ObjectHideFlags: 0
@@ -5164,7 +5222,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -0.00002270937, y: 0}
-  m_SizeDelta: {x: -1527.9543, y: 0}
+  m_SizeDelta: {x: -1527.9541, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &4288763156829089999
 MonoBehaviour:
@@ -8211,7 +8269,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: 01643d1d89609f348b64e6c5d959779b, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: 1f95fe9d3da86844bbe729f671c0a59e, type: 3}
-  testic: 0
 --- !u!1 &4700645774619752691
 GameObject:
   m_ObjectHideFlags: 0
@@ -8921,7 +8978,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: f633cb0b8aa736c41b930b0041705d4a, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: 82daa729f102a484d991dbb6b3f0970a, type: 3}
-  testic: 0
 --- !u!1 &5547670919730522137
 GameObject:
   m_ObjectHideFlags: 0
@@ -9730,6 +9786,7 @@ GameObject:
   - component: {fileID: 4849033218853489869}
   - component: {fileID: 7707904590004471225}
   - component: {fileID: 8309231009203050903}
+  - component: {fileID: 3254189023311950896}
   m_Layer: 0
   m_Name: Image_A
   m_TagString: Untagged
@@ -9795,6 +9852,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3254189023311950896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6555033331712989058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9888916fb42f3847922b67137218369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _josticImage: {fileID: 21300000, guid: d06ee2a6dd527fb4783f1f91c23a917f, type: 3}
+  _keyBoardImage: {fileID: 0}
 --- !u!1 &6597529350307005778
 GameObject:
   m_ObjectHideFlags: 0
@@ -10334,6 +10405,7 @@ GameObject:
   - component: {fileID: 46092401305921802}
   - component: {fileID: 5745020783864950948}
   - component: {fileID: 8591338427710050387}
+  - component: {fileID: 5988337882173114147}
   m_Layer: 0
   m_Name: ImageIcon
   m_TagString: Untagged
@@ -10399,6 +10471,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5988337882173114147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7816765486828756344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9888916fb42f3847922b67137218369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _josticImage: {fileID: 21300000, guid: 01643d1d89609f348b64e6c5d959779b, type: 3}
+  _keyBoardImage: {fileID: 0}
 --- !u!1 &7874612614499350822
 GameObject:
   m_ObjectHideFlags: 0
@@ -10624,7 +10710,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _josticImage: {fileID: 21300000, guid: b324d13eda02b024a9b4c642c73099e2, type: 3}
   _keyBoardImage: {fileID: 21300000, guid: a789656ffef6a644eb9633d2f9566aa4, type: 3}
-  testic: 0
 --- !u!1 &8161810710425201669
 GameObject:
   m_ObjectHideFlags: 0
@@ -10636,6 +10721,7 @@ GameObject:
   - component: {fileID: 7454094807598978851}
   - component: {fileID: 4361958071247447313}
   - component: {fileID: 2612328621603241198}
+  - component: {fileID: 8886519525364122639}
   m_Layer: 0
   m_Name: Image_Y
   m_TagString: Untagged
@@ -10701,6 +10787,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8886519525364122639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8161810710425201669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9888916fb42f3847922b67137218369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _josticImage: {fileID: 21300000, guid: 2ce5ef5051da3b045b61b98e01c9d490, type: 3}
+  _keyBoardImage: {fileID: 0}
 --- !u!1 &8213207307430811937
 GameObject:
   m_ObjectHideFlags: 0

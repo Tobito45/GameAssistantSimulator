@@ -12,7 +12,12 @@ using UnityEngine.UI;
 public class MonitorSelectGood : MonoBehaviour
 {
     private const float COOLDOWN = 3f;
-    private const int MAXCOUNTMODES = 2;
+    private const int MAX_COUNT_MODES = 2;
+    private readonly Vector2 NUMBER_SIZE_NUMBERS_UP_TWO = new Vector2(130, 130);
+    private readonly Vector2 NUMBER_SIZE_NUMBERS_DOWN_TWO = new Vector2(250, 250);
+
+    private readonly Vector2 SELECT_SIZE_UP_TWO = new Vector2(152, 141.5f);
+    private readonly Vector2 SELECT_SIZE_DOWN_TWO = new Vector2(304, 283);
 
     [Header("Json")]
     [SerializeField]
@@ -25,11 +30,7 @@ public class MonitorSelectGood : MonoBehaviour
     private Image _goodPrefab;
     [SerializeField]
     private GameObject _numberPrefab;
-   // [SerializeField]
-   // private MonitorGoodList[] _goodList;
-
-    //[SerializeField]
-    //private GameObject[] _monitorSelecter, _yPanel, _selecterCanvas;
+  
     private float[] timer = new float[KeyboardAndJostickController.MAXPLAYERS];
 
     [SerializeField]
@@ -49,6 +50,7 @@ public class MonitorSelectGood : MonoBehaviour
 
     private void Start()
     {
+        GameController.Instance.OnStartNewGame += OnStartSettings;
         TextAsset json = Resources.Load<TextAsset>(jsonName);
         string jsonFile = json.ToString();
         SelectedDataJson[] dataObject = JsonConvert.DeserializeObject<SelectedDataJson[]>(jsonFile);
@@ -84,7 +86,6 @@ public class MonitorSelectGood : MonoBehaviour
         }
         MainController.ForeachAllObjects(_objectsScene.Where(n => n.GetMonitroSelecter != null).Select(n => n.GetMonitroSelecter).ToArray(), (g) => g.SetActive(false));
         MainController.ForeachAllObjects(_objectsScene.Where(n => n.GetYPanel != null).Select(n => n.GetYPanel).ToArray(), (g) => g.SetActive(true));
-
     }
 
     private void Update()
@@ -103,12 +104,28 @@ public class MonitorSelectGood : MonoBehaviour
         {
             if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
                 continue;
-
-            //_buttonPay[index].onClick.Invoke();
         }
-
         DetectUIChanges();
 
+    }
+
+    private void OnStartSettings()
+    {
+        foreach (var obj in _buttonsModes.Select(n => n.GetScrollNumberCode))
+        {
+            if (KeyboardAndJostickController.GetCountGamepads() > 2)
+                obj.GetComponent<GridLayoutGroup>().cellSize = NUMBER_SIZE_NUMBERS_UP_TWO;
+            else
+                obj.GetComponent<GridLayoutGroup>().cellSize = NUMBER_SIZE_NUMBERS_DOWN_TWO;
+        }
+
+        foreach (var obj in _buttonsModes.Select(n => n.GetScrollSelectedGood))
+        {
+            if (KeyboardAndJostickController.GetCountGamepads() > 2)
+                obj.GetComponent<GridLayoutGroup>().cellSize = SELECT_SIZE_UP_TWO;
+            else
+                obj.GetComponent<GridLayoutGroup>().cellSize = SELECT_SIZE_DOWN_TWO;
+        }
     }
 
     private void DetectUIChanges()

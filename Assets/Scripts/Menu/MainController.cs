@@ -15,7 +15,7 @@ public class MainController : MonoBehaviour
     private const float TIMERBOARDERFORMENUITERATION = 0.2f;
     [Header("Panels")]
     [SerializeField]
-    private GameObject _panelMenu, _rankPanel;
+    private GameObject _panelMenu, _rankPanel, _backgroundImage;
    // [SerializeField]
    // private GameObject[] _panelGame;
 
@@ -128,6 +128,7 @@ public class MainController : MonoBehaviour
         GameController.Instance.SplitController.SetActiveCamers(true);
 
         _panelMenu.SetActive(false);
+        _backgroundImage.SetActive(true);
         ClearMenuControllingJostic(0);
         ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(true); });
         ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(true); });
@@ -297,7 +298,7 @@ public class MainController : MonoBehaviour
         ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
         ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(false); });
         GameController.Instance.SetCityActive(true);
-
+        _backgroundImage.SetActive(false);
 
         ActivateMenuControllingJostic(0);
         

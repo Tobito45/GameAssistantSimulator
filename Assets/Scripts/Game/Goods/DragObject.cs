@@ -238,6 +238,8 @@ public class DragObject : MonoBehaviour
         if (index != Index)
             return;
 
+
+        Debug.Log(gameObject.name);
         _outline.enabled = false;
         if (_isDragging)
             LetGoItem();

@@ -2642,6 +2642,7 @@ GameObject:
   - component: {fileID: 8296363261983102526}
   - component: {fileID: 8296363261983102520}
   - component: {fileID: 8296363261983102521}
+  - component: {fileID: 2073273084935436680}
   m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
@@ -2697,7 +2698,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2ce5ef5051da3b045b61b98e01c9d490, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9c60eeddcb9975a4682f6bf713052e41, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2707,6 +2708,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2073273084935436680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8296363261983102527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9888916fb42f3847922b67137218369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _josticImage: {fileID: 21300000, guid: 2ce5ef5051da3b045b61b98e01c9d490, type: 3}
+  _keyBoardImage: {fileID: 21300000, guid: 9c60eeddcb9975a4682f6bf713052e41, type: 3}
 --- !u!1 &8296363261989210907
 GameObject:
   m_ObjectHideFlags: 0

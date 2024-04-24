@@ -37,6 +37,10 @@ public class SplitController : MonoBehaviour
                     camers[0].rect = new Rect(0,0.5f, 0.5f, 0.5f);
                     camers[1].rect = new Rect(0.5f, 0f, 0.5f, 0.5f);
                     camers[2].rect = new Rect(0.5f,0.5f, 0.5f, 0.5f);
+
+                    //to create black screen
+                    camers[3].rect = new Rect(0f, 0f, 0.5f, 0.5f);
+                    camers[3].gameObject.SetActive(true);
                     break;
                 case 4:
                     camers[0].rect = new Rect(0f, 0.5f, 0.5f, 0.5f);

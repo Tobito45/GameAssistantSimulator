@@ -18,5 +18,25 @@
     "PathImage": "Images/cookie",
     "Name": "Cookie",
     "Price": 0.39
+  },
+  {
+    "PathImage": "Images/piece_cake",
+    "Name": "Piece cake",
+    "Price": 0.59
+  },
+  {
+    "PathImage": "Images/cheescake",
+    "Name": "Cheesecake",
+    "Price": 1.39
+  },
+  {
+    "PathImage": "Images/donut_brown",
+    "Name": "Donut brown",
+    "Price": 0.69
+  },
+  {
+    "PathImage": "Images/pretzel",
+    "Name": "Pretzel",
+    "Price": 0.59
   }
 ]

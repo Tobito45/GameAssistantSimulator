@@ -53,6 +53,12 @@ public class InputKeyboardController : MonoBehaviour
                     _layoutGroup[i].cellSize = new Vector2(75, 75);
                     _movementConst[i] = 5;
                     break;
+                case 3:
+                case 4:
+                    _layoutGroup[i].constraintCount = 3;
+                    _layoutGroup[i].cellSize = new Vector2(50, 50);
+                    _movementConst[i] = 3;
+                    break;
 
             }
         }

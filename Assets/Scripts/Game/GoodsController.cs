@@ -11,6 +11,9 @@ public class GoodsController : MonoBehaviour
     [SerializeField]
     private MainController _mainController;
 
+    [SerializeField]
+    private RotateController _rotateController;
+
     private const float distanceBetweenObjects = 0.05f;
     private const float moveObjects = -0.4f;
     private const float picesOfObject = 4f;
@@ -97,7 +100,7 @@ public class GoodsController : MonoBehaviour
             else
                 _UIPlayerElements[i].GetFooterPanel.SetActive(true);
 
-            if (_goodSelected[i] != null || Input.GetMouseButton(0))
+            if (_rotateController.ObjectRotate.ElementAt(i) != null)//_goodSelected[i] != null || Input.GetMouseButton(0))
             {
                 _UIPlayerElements[i].GetLetGoPanel.SetActive(true);
                 _UIPlayerElements[i].GetPickPanel.SetActive(false);
