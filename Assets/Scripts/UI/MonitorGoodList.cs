@@ -23,7 +23,14 @@ public class MonitorGoodList : MonoBehaviour
     private List<GoodInfo> _goodList = new List<GoodInfo>();
     private float _sum;
 
+
     private void Start()
+    {
+        GameController.Instance.OnStartNewGame += ClearList;
+        SetBasicInfo();
+    }
+
+    private void SetBasicInfo()
     {
         _sum = 0;
         _textSum.text = string.Empty;
@@ -52,10 +59,15 @@ public class MonitorGoodList : MonoBehaviour
         if (index != i)
             return;
 
+        ClearList();
+    }
+
+    public void ClearList()
+    {
         _goodList.Clear();
-        foreach(Transform item in _goodsInScrollContent)
+        foreach (Transform item in _goodsInScrollContent)
             Destroy(item.gameObject);
-        
-        Start();
+
+        SetBasicInfo();
     }
 }

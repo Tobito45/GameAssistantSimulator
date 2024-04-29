@@ -166,7 +166,7 @@ public class GoodsController : MonoBehaviour
 
         newObject.GetComponent<DragObject>().OnEnterContainer += AddGood;
         newObject.GetComponent<DragObject>().OnExitContainer += RemoveGood;
-        newObject.GetComponent<DragObject>().OnLetGoGood += RemoveIntemFromSelected;
+        newObject.GetComponent<DragObject>().OnLetGoGood += RemoveItemFromSelected;
         newObject.GetComponent<DragObject>().Index = index;
         _goodsOnConveer[index].Add(newObject);
 
@@ -190,15 +190,17 @@ public class GoodsController : MonoBehaviour
 
     private void AfterPayLocker(int index) => _lockAutoPay[index] = true; 
 
-    private void RemoveIntemFromSelected(DragObject good, int index)
+    private void RemoveItemFromSelected(DragObject good, int index)
     {
         if (_indexSelected[index] >= 0 && _indexSelected[index] < _goodsCanBeSelected[index].Count)
             if (_goodsCanBeSelected[index][_indexSelected[index]] == good)
                 IndexSelectedItemPlus(index);
 
-        Debug.Log("why?");
         _goodsCanBeSelected[index].Remove(good);
-        IndexSelectedItemPlus(index);
+        _indexSelected[index]--;
+        if (_indexSelected[index] < 0)
+            _indexSelected[index] = 0;
+       // IndexSelectedItemPlus(index);
 
     }
 

@@ -20,6 +20,7 @@ public class JosticScrollViewController : MonoBehaviour
     [Header("Scroll bars")]
     [SerializeField]
     private Scrollbar _horizontalScrollBar;
+    [SerializeField]
     private Scrollbar _vericalScrollBar;
 
     private void Update()
