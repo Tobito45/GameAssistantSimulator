@@ -9,11 +9,8 @@ public class RotateController : MonoBehaviour
 
     private GameObject[] _objectsRotate = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
     public IEnumerable<GameObject> ObjectRotate => _objectsRotate;
-
     public void SetObjectRotate(int index, GameObject obj) => _objectsRotate[index] = obj;
-
     public DragObject DragObject(int index) => ObjectRotate.ElementAt(index)?.GetComponent<DragObject>();
-
     public GoodInfo GoodInfo(int index) => ObjectRotate.ElementAt(index)?.GetComponent<GoodInfo>();
 
 
@@ -22,15 +19,12 @@ public class RotateController : MonoBehaviour
         for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
             if (DragObject(i) == null || GameController.Instance.IsOpenedPanelUI[i])
-            {
                 continue;
-            }
 
             float horizontalInput = 0;
             float verticalInput = 0;
             horizontalInput = -KeyboardAndJostickController.GetRotate(DragObject(i).Index).horizontal;
             verticalInput = KeyboardAndJostickController.GetRotate(DragObject(i).Index).vertical;
-
 
             float rotationAmount = rotationSpeed * Time.deltaTime;
 

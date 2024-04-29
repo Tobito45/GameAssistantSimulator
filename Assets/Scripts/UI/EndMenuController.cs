@@ -14,7 +14,6 @@ public class EndMenuController : MonoBehaviour
 
     [SerializeField]
     private GameObject _panelEndInfoPrefab;
-
     [SerializeField]
     private MainController _mainController;
 
@@ -65,6 +64,10 @@ public class EndMenuController : MonoBehaviour
     public void AktualText(float sum, int index) => _objectScene[index].GetTextScope.text = $"score: {sum.ToString("F2")}";
     public void ClosePanelEnd()
     {
+        for (int i = 0; i < KeyboardAndJostickController.GetCountControllers(); i++)
+            if (!IsEndPanelActive(i))
+                return;
+
         FunctionsExtensions.ForeachAllObjects(_objectScene.Where(n => n.GetPanelEnd != null).Select(n => n.GetPanelEnd).ToArray(), (obj) => obj.SetActive(false));
         _mainController.OpenMenuAndCloseGame();
     }
@@ -73,6 +76,7 @@ public class EndMenuController : MonoBehaviour
     {
         if (string.IsNullOrEmpty(_objectScene[index].GetInputFieldName.text))
         {
+            //show error message
             StartCoroutine(FunctionsExtensions.MakeActionAfterTime(
                 () => _objectScene[index].GetWarningSymbol.SetActive(true),
                 () => _objectScene[index].GetWarningSymbol.SetActive(false), 2));
@@ -84,7 +88,6 @@ public class EndMenuController : MonoBehaviour
 
         _objectScene[index].GetPanelInputName.SetActive(false);
     }
-
   
     public static string GetByPattern(string pattern, string input) => Regex.Match(input, pattern).Groups[1].Value;
 }

@@ -54,35 +54,11 @@ public class MonitorSelectGood : MonoBehaviour
 
         for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
-            foreach (var item in dataObject)
-            {
-                var obj = Instantiate(_goodPrefab, _buttonsModes[i].GetScrollSelectedGood.transform);
-                Sprite loadedSprite = Resources.Load<Sprite>(item.PathImage);
+            GenerateSelectedItems(dataObject, i);
 
-                obj.transform.GetChild(0).gameObject.SetActive(false);
-
-                Transform button = obj.transform.GetChild(1);
-                button.GetComponent<Image>().sprite = loadedSprite;
-                var comp = button.AddComponent<GoodInfoSelect>();
-                comp.SetSelectInfo(item.Price, item.Name);
-
-                int index = i;
-                button.GetComponent<Button>().onClick.AddListener(() => OnSelectObject(obj.gameObject, index));
-            }
             AfterPay += _objectsScene[i].GetGoodList.ClearGoods;
-
-            for (int j = 1; j <= 9; j++)
-            {
-                var obj = Instantiate(_numberPrefab, _buttonsModes[i].GetScrollNumberCode.transform);
-                obj.GetComponentInChildren<TextMeshProUGUI>().text = j.ToString();
-                int index = i;
-                obj.GetComponentInChildren<Button>().onClick.AddListener(() => {
-                    OnSelectObject(obj.gameObject, index);
-                    if (!KeyboardAndJostickController.IsJosticConnected)
-                        OnApply(0);
-
-                }); 
-            }
+            GenerateNumberItems(i);
+            
             ActivaeButtonModeWithIterator(i);
 
         }
@@ -90,29 +66,50 @@ public class MonitorSelectGood : MonoBehaviour
         FunctionsExtensions.ForeachAllObjects(_objectsScene.Where(n => n.GetYPanel != null).Select(n => n.GetYPanel).ToArray(), (g) => g.SetActive(true));
     }
 
+    private void GenerateNumberItems(int i)
+    {
+        for (int j = 1; j <= 9; j++)
+        {
+            var obj = Instantiate(_numberPrefab, _buttonsModes[i].GetScrollNumberCode.transform);
+            obj.GetComponentInChildren<TextMeshProUGUI>().text = j.ToString();
+            int index = i;
+            obj.GetComponentInChildren<Button>().onClick.AddListener(() =>
+            {
+                OnSelectObject(obj.gameObject, index);
+                if (!KeyboardAndJostickController.IsJosticConnected)
+                    OnApply(0);
+
+            });
+        }
+    }
+
+    private void GenerateSelectedItems(SelectedDataJson[] dataObject, int i)
+    {
+        foreach (var item in dataObject)
+        {
+            var obj = Instantiate(_goodPrefab, _buttonsModes[i].GetScrollSelectedGood.transform);
+            Sprite loadedSprite = Resources.Load<Sprite>(item.PathImage);
+
+            obj.transform.GetChild(0).gameObject.SetActive(false);
+
+            Transform button = obj.transform.GetChild(1);
+            button.GetComponent<Image>().sprite = loadedSprite;
+            var comp = button.AddComponent<GoodInfoSelect>();
+            comp.SetSelectInfo(item.Price, item.Name);
+
+            int index = i;
+            button.GetComponent<Button>().onClick.AddListener(() => OnSelectObject(obj.gameObject, index));
+        }
+    }
+
     private void Update()
     {
-
-        foreach (int index in KeyboardAndJostickController.SelectNextGoodOnMonitor())
-        {
-            if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                continue;
-
-            NextObjectSelect(index);
-        }
-
-
-        foreach (int index in KeyboardAndJostickController.ConfirmPayment())
-        {
-            if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                continue;
-        }
         DetectUIChanges();
-
     }
 
     private void OnStartSettings()
     {
+        //setting setting for grid layout to numbers selecter scroll
         foreach (var obj in _buttonsModes.Select(n => n.GetScrollNumberCode))
         {
             if (KeyboardAndJostickController.GetCountControllers() > 2)
@@ -121,6 +118,7 @@ public class MonitorSelectGood : MonoBehaviour
                 obj.GetComponent<GridLayoutGroup>().cellSize = NUMBER_SIZE_NUMBERS_DOWN_TWO;
         }
 
+        //setting setting for grid layout to goods selecter scroll
         foreach (var obj in _buttonsModes.Select(n => n.GetScrollSelectedGood))
         {
             if (KeyboardAndJostickController.GetCountControllers() > 2)
@@ -134,84 +132,113 @@ public class MonitorSelectGood : MonoBehaviour
     {
         if (KeyboardAndJostickController.IsJosticConnected)
         {
-            foreach (int index in KeyboardAndJostickController.GetAButton())
-            {
-                if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                    continue;
-
-                _buttonsModes[index].GetButtonRight.onClick.Invoke();
-            }
-
-
-            foreach (int index in KeyboardAndJostickController.GetYButton())
-            {
-                if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                    continue;
-
-                _buttonsModes[index].GetButtonLeft.onClick.Invoke();
-            }
+            ActivateRightButton();
+            ActivateLeftButton();
 
             if (!_mainController.IsMenu)
             {
-
-                foreach (int index in KeyboardAndJostickController.GetBButton())
-                {
-                    if (_objectsScene[index].GetSelecterCanvas.activeInHierarchy && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                        ActiveOrDisableCanvasSelect(index);
-                }
-
-                //getting everyone who pressed Y
-                foreach (int index in KeyboardAndJostickController.GetYButton())
-                {
-                    //check if the product selection panel can be activated
-                    if (!_objectsScene[index].GetSelecterCanvas.activeInHierarchy && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                        //activation of the product selection panel
-                        ActiveOrDisableCanvasSelect(index); 
-                }
+                DisablePanelSelect();
+                EnablePanelSelect();
             }
 
-            foreach (int index in KeyboardAndJostickController.GetButtonLT())
+            ChangePanelsInSelectPanel();
+            MoveSelectedItemInScrolls();
+        }
+    }
+
+    private void MoveSelectedItemInScrolls()
+    {
+        for (int i = 0; i < KeyboardAndJostickController.GetCountControllers(); i++)
+        {
+            if (!GameController.Instance.IsOpenedPanelUI[i])
+                continue;
+
+            if (timer[i] < 0)
             {
-                if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                    continue;
+                var movement = KeyboardAndJostickController.GetMovement(i);
 
-                ActivaeButtonModeWithIterator(index);
+                if (movement.horizontal > 0.25f)
+                    NextObjectSelect(i, -1);
+                else if (movement.horizontal < -0.25f)
+                    NextObjectSelect(i, 1);
+                else if (movement.vertical > 0.25f)
+                    NextObjectSelect(i, -_objectsWillBeIterated[i].Count / _buttonsModes[i].GetKoeficent);
+                else if (movement.vertical < -0.25f)
+                    NextObjectSelect(i, _objectsWillBeIterated[i].Count / _buttonsModes[i].GetKoeficent);
+
+                timer[i] = 0.07f;
             }
-
-
-            for (int i = 0; i < KeyboardAndJostickController.GetCountControllers(); i++)
+            else
             {
-                if (!GameController.Instance.IsOpenedPanelUI[i])
-                    continue;
-
-                if (timer[i] < 0)
-                {
-                    var movement = KeyboardAndJostickController.GetMovement(i);
-
-                    if (movement.horizontal > 0.25f)
-                    {
-                        NextObjectSelect(i, -1);
-                    }
-                    else if (movement.horizontal < -0.25f)
-                    {
-                        NextObjectSelect(i, 1);
-                    }
-                    else if (movement.vertical > 0.25f)
-                    {
-                        NextObjectSelect(i, -_objectsWillBeIterated[i].Count / _buttonsModes[i].GetKoeficent);
-
-                    }
-                    else if (movement.vertical < -0.25f)
-                    {
-                        NextObjectSelect(i, _objectsWillBeIterated[i].Count / _buttonsModes[i].GetKoeficent);
-                    }
-                    timer[i] = 0.07f;
-                }
-                else
-                {
-                    timer[i] -= Time.deltaTime;
-                }
+                timer[i] -= Time.deltaTime;
             }
+        }
+    }
+
+    private void ChangePanelsInSelectPanel()
+    {
+        //getting everyone who pressed RT
+        foreach (int index in KeyboardAndJostickController.GetButtonRT())
+        {
+            //check if the product selection panel is activated
+            if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                continue;
+
+            //activation of the product selection controlling
+            ActivaeButtonModeWithIterator(index);
+        }
+    }
+
+    private void EnablePanelSelect()
+    {
+        //getting everyone who pressed Y
+        foreach (int index in KeyboardAndJostickController.GetYButton())
+        {
+            //check if the product selection panel can be activated
+            if (!_objectsScene[index].GetSelecterCanvas.activeInHierarchy && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                //activation of the product selection panel
+                ActiveOrDisableCanvasSelect(index);
+        }
+    }
+
+    private void DisablePanelSelect()
+    {
+        //getting everyone who pressed B
+        foreach (int index in KeyboardAndJostickController.GetBButton())
+        {
+            //check if the product selection panel can be activated
+            if (_objectsScene[index].GetSelecterCanvas.activeInHierarchy && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                //disable of the product selection panel
+                ActiveOrDisableCanvasSelect(index);
+        }
+    }
+
+    private void ActivateLeftButton()
+    {
+        //getting everyone who pressed Y
+        foreach (int index in KeyboardAndJostickController.GetYButton())
+        {
+            //check if the product selection panel is activated
+            if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                continue;
+
+
+            //activating right button
+            _buttonsModes[index].GetButtonLeft.onClick.Invoke();
+        }
+    }
+
+    private void ActivateRightButton()
+    {
+        //getting everyone who pressed A
+        foreach (int index in KeyboardAndJostickController.GetAButton())
+        {
+            //check if the product selection panel is activated
+            if (!GameController.Instance.IsOpenedPanelUI[index] && !GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                continue;
+
+            //activating right button
+            _buttonsModes[index].GetButtonRight.onClick.Invoke();
         }
     }
 
@@ -317,11 +344,8 @@ public class MonitorSelectGood : MonoBehaviour
         _buttonsModes[index].GetButtonLeft.interactable = true;
 
         _objectsScene[index].GetYPanel.SetActive(true);
-        //if(GameController.Instance.IsOpenedPanelUI[index])
-        //    ActiveOrDisableCanvasSelect(index);
     }
 }
-
 
 class SelectedDataJson
 {
@@ -347,7 +371,6 @@ class MonitorSelectSceneObjectsPlayerIterator
     public GameObject GetSelecterCanvas => _selecterCanvas;
 
 }
-
 
 [System.Serializable]
 class MonitorSelectUIPlayerIterator

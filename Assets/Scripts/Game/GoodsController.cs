@@ -10,9 +10,9 @@ public class GoodsController : MonoBehaviour
     [SerializeField]
     private float distanceBetweenObjects = 0.05f;
     [SerializeField]
-    private const float moveObjects = -0.4f;
+    private float moveObjects = -0.4f;
     [SerializeField]
-    private const float picesOfObject = 4f;
+    private float picesOfObject = 4f;
 
     [Header("References")]
     [SerializeField]
@@ -49,44 +49,15 @@ public class GoodsController : MonoBehaviour
 
     private void Update()
     {
-        foreach (int index in KeyboardAndJostickController.MoveGoodsConveyon())
-        {
-            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                continue;
+        MoveConveyor();
+        ChangeSelectedGood();
+        PickUpGood();
+        LetsGoGood();
+        ShowTutorialPanel();
+    }
 
-            foreach (GameObject good in _goodsOnConveer[index])
-                good.transform.position += new Vector3(moveObjects * Time.deltaTime, 0, 0);
-        }
-
-
-        foreach (int index in KeyboardAndJostickController.ChangeGoods())
-        {
-            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                continue;
-
-            IndexSelectedItemPlus(index);
-        }
-
-        foreach (int index in KeyboardAndJostickController.TakeGood())
-        {
-            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                continue;
-
-            if (_indexSelected[index] != -1)
-            {
-                _goodSelected[index] = _goodsCanBeSelected[index][_indexSelected[index]];
-                _goodSelected[index].TakeItem();
-            }
-        }
-
-        foreach (int index in KeyboardAndJostickController.LetsGoGood())
-        {
-            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
-                continue;
-
-            _goodSelected[index] = null;
-        }
-
+    private void ShowTutorialPanel()
+    {
         for (int i = 0; i < KeyboardAndJostickController.MAXPLAYERS; i++)
         {
             if (!KeyboardAndJostickController.IsJosticConnected)
@@ -104,29 +75,80 @@ public class GoodsController : MonoBehaviour
             {
                 _UIPlayerElements[i].GetLetGoPanel.SetActive(true);
                 _UIPlayerElements[i].GetPickPanel.SetActive(false);
-            } else if (_goodsCanBeSelected[i].Count > 0) 
+            }
+            else if (_goodsCanBeSelected[i].Count > 0)
             {
                 _UIPlayerElements[i].GetLetGoPanel.SetActive(false);
                 _UIPlayerElements[i].GetPickPanel.SetActive(true);
-            } else
+            }
+            else
             {
                 _UIPlayerElements[i].GetLetGoPanel.SetActive(false);
                 _UIPlayerElements[i].GetPickPanel.SetActive(false);
             }
 
-
             if (!_lockAutoPay[i] && _goodsCanBeSelected[i].Count == 0 && _goodSelected[i] == null && _goodsOnConveer[i].Count == 0
-                    && !_mainController.IsMenu) 
+                    && !_mainController.IsMenu)
             {
                 _monitorSelectGood.OnPay(i);
             }
         }
     }
 
+    private void LetsGoGood()
+    {
+        foreach (int index in KeyboardAndJostickController.GetBButton())
+        {
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                continue;
+
+            _goodSelected[index] = null;
+        }
+    }
+
+    private void PickUpGood()
+    {
+        foreach (int index in KeyboardAndJostickController.GetAButton())
+        {
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                continue;
+
+            if (_indexSelected[index] != -1)
+            {
+                _goodSelected[index] = _goodsCanBeSelected[index][_indexSelected[index]];
+                _goodSelected[index].TakeItem();
+            }
+        }
+    }
+
+    private void ChangeSelectedGood()
+    {
+        foreach (int index in KeyboardAndJostickController.GetButtonLT())
+        {
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                continue;
+
+            IndexSelectedItemPlus(index);
+        }
+    }
+
+    private void MoveConveyor()
+    {
+        foreach (int index in KeyboardAndJostickController.GetButtonRT())
+        {
+            if (GameController.Instance.IsOpenedPanelUI[index] || GameController.Instance.EndMenuController.IsEndPanelActive(index))
+                continue;
+
+            foreach (GameObject good in _goodsOnConveer[index])
+                good.transform.position += new Vector3(moveObjects * Time.deltaTime, 0, 0);
+        }
+    }
 
     public GameObject AddNewItem(int index)
     {
         (float posX, float sizeX, int deteceted) aktualGoodX = (0.0f, 0.0f, 0);
+        
+        //finding new position for creating new good
         if (_goodsOnConveer[index].Count > 0)
         {
             var maxGoodPos = _goodsOnConveer[index].Max(n => n.gameObject.transform.position.x);
@@ -134,8 +156,10 @@ public class GoodsController : MonoBehaviour
             aktualGoodX = (aktrualGood.transform.position.x, aktrualGood.transform.lossyScale.x, 1);
         }
 
+        //creating new good
         var newObject = Instantiate(GeneratorGoods.Instance.GetRandomGood(), _UIPlayerElements[index].GetPointCreate.transform.position, Quaternion.identity);
 
+        //actualization new good position
         newObject.transform.position += new Vector3(((aktualGoodX.posX - _UIPlayerElements[index].GetPointCreate.position.x)
                                     + aktualGoodX.sizeX / picesOfObject + newObject.transform.lossyScale.x / picesOfObject
                                     + distanceBetweenObjects) * aktualGoodX.deteceted, 0, 0);
@@ -168,11 +192,11 @@ public class GoodsController : MonoBehaviour
 
     private void RemoveIntemFromSelected(DragObject good, int index)
     {
-
         if (_indexSelected[index] >= 0 && _indexSelected[index] < _goodsCanBeSelected[index].Count)
             if (_goodsCanBeSelected[index][_indexSelected[index]] == good)
                 IndexSelectedItemPlus(index);
 
+        Debug.Log("why?");
         _goodsCanBeSelected[index].Remove(good);
         IndexSelectedItemPlus(index);
 
@@ -190,7 +214,6 @@ public class GoodsController : MonoBehaviour
 
     private void AddGood(GameObject good, int index)
     {
-
         if (_goodsOnConveer[index].Contains(good))
             return;
 
@@ -227,8 +250,6 @@ public class GoodsController : MonoBehaviour
             _goodsCanBeSelected[index][_indexSelected[index]].CanBeSelected(true);
 
     }
-
-    private void OnEndGame(int index) => _UIPlayerElements[index].GetFooterPanel.SetActive(false);
 }
 
 

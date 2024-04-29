@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class MonitorGoodList : MonoBehaviour
 {
-    private List<GoodInfo> _goodList = new List<GoodInfo>();
-
     [SerializeField]
     private int index;
     [SerializeField]
@@ -22,6 +20,7 @@ public class MonitorGoodList : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI _textSum;
 
+    private List<GoodInfo> _goodList = new List<GoodInfo>();
     private float _sum;
 
     private void Start()
@@ -58,7 +57,5 @@ public class MonitorGoodList : MonoBehaviour
             Destroy(item.gameObject);
         
         Start();
-
-
     }
 }

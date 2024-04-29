@@ -19,7 +19,6 @@ public class SplitController : MonoBehaviour
             for(int i = 0; i < countCamers; i++)
                 camers[i].gameObject.SetActive(true);
 
-
             switch(countCamers)
             {
                 case 1:

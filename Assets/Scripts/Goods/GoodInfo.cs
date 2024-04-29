@@ -4,7 +4,6 @@ public class GoodInfo : MonoBehaviour
 {
     [SerializeField]
     protected string _goodName;
-
     [SerializeField]
     protected float _price;
 

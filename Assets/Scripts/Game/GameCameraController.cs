@@ -6,11 +6,6 @@ using UnityEngine;
 
 public class GameCameraController : MonoBehaviour
 {
-    private float _basicCameraValueZoom;
-    private Camera _camera;
-    private Vector3 _positionStart;
-    private bool _gameWasEnd;
-
     [SerializeField]
     private int _index;
 
@@ -23,8 +18,16 @@ public class GameCameraController : MonoBehaviour
     private float _minValueZoom;
     [SerializeField]
     private float _maxDistanceToMove;
+    [SerializeField]
+    private float _maxKoeficientMouseZoom;
 
-    void Start()
+    private float _basicCameraValueZoom;
+    private Camera _camera;
+    private Vector3 _positionStart;
+    private bool _gameWasEnd;
+    private float _aktualMouseKoeficien;
+
+    private void Awake()
     {
         GameController.Instance.OnStartNewGame += OnStartGame;
         GameController.Instance.OnEndGame += OnEndGame;
@@ -39,6 +42,11 @@ public class GameCameraController : MonoBehaviour
         _camera.fieldOfView = _basicCameraValueZoom;
         _camera.gameObject.transform.position = _positionStart;
         _gameWasEnd = false;
+
+        if (KeyboardAndJostickController.IsJosticConnected)
+            _aktualMouseKoeficien = 1f;
+        else
+            _aktualMouseKoeficien = _maxKoeficientMouseZoom;
     }
 
     private void OnEndGame(int index)
@@ -55,10 +63,10 @@ public class GameCameraController : MonoBehaviour
             return;
 
         if (KeyboardAndJostickController.GetUpButton().Contains(_index) && _camera.fieldOfView > _minValueZoom)
-                _camera.fieldOfView -= _speedZoom * Time.deltaTime;
+                _camera.fieldOfView -= _speedZoom * Time.deltaTime * _aktualMouseKoeficien;
         
         if (KeyboardAndJostickController.GetDownButton().Contains(_index) && _camera.fieldOfView < _basicCameraValueZoom)
-            _camera.fieldOfView += _speedZoom * Time.deltaTime;
+            _camera.fieldOfView += _speedZoom * Time.deltaTime * _aktualMouseKoeficien;
 
         if (KeyboardAndJostickController.GetLeftButton().Contains(_index) && _camera.transform.position.x < _positionStart.x + _maxDistanceToMove)
             _camera.transform.position += new Vector3(_speedMovement * Time.deltaTime, 0, 0);

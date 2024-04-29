@@ -129,9 +129,8 @@ public class InputKeyboardController : MonoBehaviour
         _indexForIterator[index] += countAdd;
 
         if (_indexForIterator[index] >= _objectsWillBeIterated[index].Count || _indexForIterator[index] < 0)
-        {
             _indexForIterator[index] -= countAdd;
-        }
+        
         if (_indexForIterator[index] < 0)
             _indexForIterator[index] = 0;
         

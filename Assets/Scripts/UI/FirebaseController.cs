@@ -35,7 +35,7 @@ public class FirebaseController : MonoBehaviour
 
     public void ChangeFilterDate(int type)
     {
-        //Inspector Unity problem, cant detect enums in inspector
+        //inspector Unity problem, cant detect enums in inspector
         _filterDate = (TypeDateFilter)type; 
         foreach (Transform child in _content.transform)
             Destroy(child.gameObject);
@@ -56,6 +56,7 @@ public class FirebaseController : MonoBehaviour
         _reference.Child("users").Child(userId).SetRawJsonValueAsync(json);
         Debug.Log("Data saved");
     }
+
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)
@@ -81,7 +82,7 @@ public class FirebaseController : MonoBehaviour
         }
     }
 
-    private void MakeListSorted(ref List<UserData> userData)
+    private void MakeListSorted(List<UserData> userData)
     {
         switch (_typeOfSort)
         {
@@ -155,7 +156,7 @@ public class FirebaseController : MonoBehaviour
             Destroy(child.gameObject);
 
         //filtering by name/score/time/date
-        MakeListSorted(ref _usersData);
+        MakeListSorted(_usersData);
 
         //filtering by time period
         var dateFilteredData = MakeListNecessaryDateSorted(_usersData); 

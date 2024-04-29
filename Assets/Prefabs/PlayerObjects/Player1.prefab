@@ -1291,10 +1291,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   index: 0
   _panelPrefab: {fileID: 4927387130742644762, guid: 8e6be8157da79dc409117bc1b885265f, type: 3}
+  _goodsInScrollContent: {fileID: 8296363261317178156}
   _textName: {fileID: 8296363261776522214}
   _textPrice: {fileID: 8296363261285956905}
   _textSum: {fileID: 8296363261113101666}
-  _goodsInScrollContent: {fileID: 8296363261317178156}
 --- !u!1 &8296363261317178157
 GameObject:
   m_ObjectHideFlags: 0
@@ -2733,6 +2733,7 @@ GameObject:
   - component: {fileID: 8296363261989210903}
   - component: {fileID: 8296363261989210900}
   - component: {fileID: 8296363261989210901}
+  - component: {fileID: 3716811889370935546}
   m_Layer: 0
   m_Name: GameCameraPlayer1
   m_TagString: MainCamera
@@ -2806,6 +2807,24 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8296363261989210907}
   m_Enabled: 1
+--- !u!114 &3716811889370935546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8296363261989210907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 765b9789219a8eb49b464c018318e5f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _index: 0
+  _speedZoom: 10
+  _speedMovement: 0.5
+  _minValueZoom: 45
+  _maxDistanceToMove: 0.3
+  _maxKoeficientMouseZoom: 2.5
 --- !u!1 &8296363262111336175
 GameObject:
   m_ObjectHideFlags: 0

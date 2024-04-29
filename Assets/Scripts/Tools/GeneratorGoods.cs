@@ -20,8 +20,6 @@ public class GeneratorGoods : MonoBehaviour
 
         _instance = this;
     }
-
-    
     
     public GameObject GetRandomGood()
     {

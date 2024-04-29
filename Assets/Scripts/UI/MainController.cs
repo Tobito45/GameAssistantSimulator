@@ -145,7 +145,6 @@ public class MainController : MonoBehaviour
             GameController.Instance.SetTextTimer(_playerObjects[i].GetTextTimer, i);
         
         MenuControllerJostic();
-        
     }
 
     private void MenuControllerJostic()
@@ -176,7 +175,9 @@ public class MainController : MonoBehaviour
                             inputField.text = (int.Parse(inputField.text) + 1).ToString(); 
                         else
                         {
+                            //saving index to use it in click listeners in buttons
                             int saveIndex = index;
+                            //creating keyboard and recreate jostic controlling
                             GameController.Instance.KeyBoardForJostic.Active(index, true, () =>
                             {
                                 ClearMenuControllingJostic(saveIndex);
@@ -185,8 +186,10 @@ public class MainController : MonoBehaviour
                                 GameController.Instance.KeyBoardForJostic.Active(saveIndex, false, null);
                             });
                             ClearMenuControllingJostic(index);
+                            //creating listener to all buttons
                             GameController.Instance.KeyBoardForJostic.OnSelected[index] += (c) =>
                             {
+                                //adding remover
                                 if (c == 'D' && inputField.text.Length > 0)
                                     inputField.text = inputField.text.Substring(0, inputField.text.Length - 1);
                                 else 

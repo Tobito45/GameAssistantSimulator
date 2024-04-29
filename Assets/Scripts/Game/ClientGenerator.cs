@@ -73,42 +73,30 @@ public class ClientGenerator : MonoBehaviour
         activeCoroutines[index].Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
 
         if (client.GetComponent<Animator>() != null)
-        {
             while (client.GetComponent<Animator>().GetBool("Walk"))
-            {
                 yield return null;
-            }
-        }
         else
-        {
             yield return new WaitForSeconds(timeToWait);
-        }
+        
         activeCoroutines[index].Add(StartCoroutine(RotateToTargetAngle(client, targetWalk)));
-
-
     }
 
     private IEnumerator MoveToOutSide(GameObject client, int index)
     {
         activeCoroutines[index].Add(StartCoroutine(RotateToTargetAngle(client, targetOut)));
         while (_isRotating)
-        {
             yield return null;
-        }
+        
         _aktualTransform[index] = _transformClientInfo[index].GetWayPoints[1];
        
         activeCoroutines[index].Add(StartCoroutine(MoveToTarget(client, _aktualTransform[index], index)));
 
         if (client != null && client.GetComponent<Animator>() != null)
-        {
             while ( client.GetComponent<Animator>().GetBool("Walk"))
-            {
                 yield return null;
-            }
-        } else
-        {
+        else
             yield return new WaitForSeconds(timeToWait);
-        }
+        
         Destroy(client);
         yield return new WaitForSeconds(timeBetween);
         StopAllCoroutinesExceptCurrent(index);
@@ -126,11 +114,8 @@ public class ClientGenerator : MonoBehaviour
         while (elapsedTime < moveDuration)
         {
             elapsedTime += Time.deltaTime;
-
             float t = Mathf.Clamp01(elapsedTime / moveDuration);
-
             objToMove.transform.position = Vector3.Lerp(startPosition, target.position, t);
-
             yield return null;
         }
 
@@ -151,11 +136,8 @@ public class ClientGenerator : MonoBehaviour
         while (objectRotate != null && elapsedTime < Mathf.Abs(target - objectRotate.transform.eulerAngles.y) / rotationSpeed)
         {
             elapsedTime += Time.deltaTime;
-
             float t = Mathf.Clamp01(elapsedTime / (Mathf.Abs(target - objectRotate.transform.eulerAngles.y) / rotationSpeed));
-
             objectRotate.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
-
             yield return null;
         }
 
@@ -166,12 +148,8 @@ public class ClientGenerator : MonoBehaviour
     private void StopAllCoroutinesExceptCurrent(int index)
     {
         foreach (Coroutine coroutine in activeCoroutines[index])
-        {
             if (coroutine != null)
-            {
                 StopCoroutine(coroutine);
-            }
-        }
 
         activeCoroutines[index].Clear();
     }

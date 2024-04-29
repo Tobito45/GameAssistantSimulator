@@ -5,18 +5,18 @@ using UnityEngine;
 
 public class DragObject : MonoBehaviour
 {
-    public static float BOARDER_TO_LET_GO_GOOD = -2.1f;
-    public static float BOARDER_CANNOT_MOVE = -1.95f;
-    public static int COUNT_NUMBERS_CODE = 5;
-    public static int MAX_RANDOM_VALUE_TO_BECAME_CODE = 2;
+    private const float BOARDER_TO_LET_GO_GOOD = -2.1f;
+    private const float BOARDER_CANNOT_MOVE = -1.95f;
+    private const int COUNT_NUMBERS_CODE = 5;
+    private const int MAX_RANDOM_VALUE_TO_BECAME_CODE = 2;
+    private const int OUTLINE_WIDTH = 7;
 
     [Header("Parameters")]
     [SerializeField]
     private float koef_mouse_pos = 0.045f;
 
     [SerializeField]
-    private const float speed = 0.5f;
-
+    private float speed = 0.5f;
     [Header("GameObjects")]
     [SerializeField]
     private GameObject _qCodeObject;
@@ -37,6 +37,7 @@ public class DragObject : MonoBehaviour
 
     private GoodInfo _good;
     private bool _isDragging = false;
+    private bool _isUnderMap = false;
     private Vector3 _offset;
 
     private bool _isActualGameIsEnd = false;
@@ -61,10 +62,12 @@ public class DragObject : MonoBehaviour
         _outline = gameObject.AddComponent<Outline>();
         _outline.enabled = false;
         _outline.OutlineMode = Outline.Mode.OutlineVisible;
-        _outline.OutlineWidth = 7;
+        _outline.OutlineWidth = OUTLINE_WIDTH;
 
         GameController.Instance.OnEndGame += OnEndGame;
 
+
+        //Qr code generation
         if (_textQrCode != null)
         {
             _textQrCode.text = null;
@@ -86,9 +89,7 @@ public class DragObject : MonoBehaviour
     private void OnMouseDown()
     {
         if (Input.GetMouseButton(0))
-        {
             TakeItem();
-        }
     }
 
     private void OnMouseUp()
@@ -133,15 +134,18 @@ public class DragObject : MonoBehaviour
         if (_isActualGameIsEnd)
             return;
 
-        if (transform.position.y < BOARDER_TO_LET_GO_GOOD && _outline.enabled)
+        if (transform.position.y < BOARDER_TO_LET_GO_GOOD && 
+            (_outline.enabled || !KeyboardAndJostickController.IsJosticConnected) && !_isUnderMap)
         {
             OnLetGoGood(this, Index);
             _outline.enabled = false;
+            //fixing problem with infinity calling method OnLetGoGood when used mouse and keyboard
+            _isUnderMap = true; 
         }
 
 
         if (!GameController.Instance.IsOpenedPanelUI[Index])
-            foreach (int index in KeyboardAndJostickController.LetsGoGood())
+            foreach (int index in KeyboardAndJostickController.GetBButton())
                 if (index == Index && _isDragging)
                     LetGoItem();
 
@@ -203,6 +207,7 @@ public class DragObject : MonoBehaviour
         if (collision.gameObject.tag == "Container")
         {
             _outline.enabled = false;
+            //getting index of container
             Match match = Regex.Match(collision.gameObject.name, @"\d+");
             OnEnterContainer(this.gameObject, int.Parse(match.Value) - 1);
         }
@@ -214,6 +219,7 @@ public class DragObject : MonoBehaviour
         {
             _outline.enabled = true && KeyboardAndJostickController.IsJosticConnected;
             _outline.OutlineColor = Color.yellow;
+            //getting index of container
             Match match = Regex.Match(collision.gameObject.name, @"\d+");
             OnExitContainer(this.gameObject, int.Parse(match.Value) - 1);
         }
@@ -230,7 +236,6 @@ public class DragObject : MonoBehaviour
     {
         if (index != Index)
             return;
-
 
         _outline.enabled = false;
 

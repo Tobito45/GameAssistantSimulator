@@ -127,12 +127,14 @@ public class GameController : MonoBehaviour
         _minusSum[index] = 0;
         _allCorect[index] = 0;
 
+        //Generating goods
         for (int i = UnityEngine.Random.Range(3, 7); i < 8; i++)
         {
             GoodInfo good = _goodsController.AddNewItem(index).GetComponentInChildren<GoodInfo>();
             _basicGoodsName[index].Add(good);
             _sum[index] += good.Price;
         }
+
         _all[index] = _basicGoodsName[index].Count;
         _clientGenerator.SpawnClient(index);
         
