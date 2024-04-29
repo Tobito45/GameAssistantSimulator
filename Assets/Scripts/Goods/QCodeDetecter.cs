@@ -7,7 +7,6 @@ public class QCodeDetecter : MonoBehaviour
 {
     [SerializeField]
     private MonitorGoodList[] _monitorGoodList;
-
    
     public void DetectGood(GoodInfo good, int index)
     {

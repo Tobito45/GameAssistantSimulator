@@ -14,10 +14,16 @@ public class GameCameraController : MonoBehaviour
     [SerializeField]
     private int _index;
 
+    [Header("Parameters")]
     [SerializeField]
-    private float _speedZoom, _speedMovement, _minValueZoom, _maxDistanceToMove;
+    private float _speedZoom;
+    [SerializeField]
+    private float _speedMovement;
+    [SerializeField]
+    private float _minValueZoom;
+    [SerializeField]
+    private float _maxDistanceToMove;
 
-    // Start is called before the first frame update
     void Start()
     {
         GameController.Instance.OnStartNewGame += OnStartGame;

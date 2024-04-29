@@ -7,7 +7,15 @@ public class DragObject : MonoBehaviour
 {
     public static float BOARDER_TO_LET_GO_GOOD = -2.1f;
     public static float BOARDER_CANNOT_MOVE = -1.95f;
+    public static int COUNT_NUMBERS_CODE = 5;
+    public static int MAX_RANDOM_VALUE_TO_BECAME_CODE = 2;
 
+    [Header("Parameters")]
+    [SerializeField]
+    private float koef_mouse_pos = 0.045f;
+
+    [SerializeField]
+    private const float speed = 0.5f;
 
     [Header("GameObjects")]
     [SerializeField]
@@ -22,14 +30,10 @@ public class DragObject : MonoBehaviour
     [SerializeField]
     private Material _selectedMaterial;
 
-    private const float koef_mouse_pos = 0.045f;
-    private const float speed = 0.5f;
+   
     private RotateController _rotateController;
     private Rigidbody _rigidbody;
     private Outline _outline;
-
-   
-
 
     private GoodInfo _good;
     private bool _isDragging = false;
@@ -52,7 +56,6 @@ public class DragObject : MonoBehaviour
         _rotateController = FindObjectOfType<RotateController>();
         _rigidbody = GetComponent<Rigidbody>();
         _good = GetComponent<GoodInfo>();
-        _basicMaterial = GetComponent<MeshRenderer>().material;
 
 
         _outline = gameObject.AddComponent<Outline>();
@@ -65,10 +68,10 @@ public class DragObject : MonoBehaviour
         if (_textQrCode != null)
         {
             _textQrCode.text = null;
-            if(UnityEngine.Random.Range(0, 2) == 0)
+            if(UnityEngine.Random.Range(0, MAX_RANDOM_VALUE_TO_BECAME_CODE) == 0)
             {
                 _textQrCode.gameObject.SetActive(true);
-                for(int i = 0; i < 5; i++)
+                for(int i = 0; i < COUNT_NUMBERS_CODE; i++)
                 {
                     _textQrCode.text = _textQrCode.text + UnityEngine.Random.Range(1, 9).ToString();
                 }
@@ -108,15 +111,10 @@ public class DragObject : MonoBehaviour
             return;
 
         if (canBeSelected)
-        {
-            //GetComponent<MeshRenderer>().material = _selectedMaterial;
             _outline.OutlineColor = Color.green;
-        }
         else
-        {
-            //GetComponent<MeshRenderer>().material = _detectedMaterial;
             _outline.OutlineColor = Color.yellow;
-        }
+
         _outline.enabled = true;
 
     }
@@ -135,30 +133,20 @@ public class DragObject : MonoBehaviour
         if (_isActualGameIsEnd)
             return;
 
-        if (transform.position.y < BOARDER_TO_LET_GO_GOOD && _outline.enabled)//GetComponent<MeshRenderer>().material != _basicMaterial)
+        if (transform.position.y < BOARDER_TO_LET_GO_GOOD && _outline.enabled)
         {
             OnLetGoGood(this, Index);
-            // GetComponent<MeshRenderer>().material = _basicMaterial;
             _outline.enabled = false;
         }
 
 
         if (!GameController.Instance.IsOpenedPanelUI[Index])
-        {
             foreach (int index in KeyboardAndJostickController.LetsGoGood())
-            {
                 if (index == Index && _isDragging)
-                {
                     LetGoItem();
 
-                }
-            }
-        }
-
         if (_isDragging && !GameController.Instance.IsOpenedPanelUI[Index])
-        {
             MoveGood();
-        }
     }
 
     private void MoveGood()
@@ -214,7 +202,6 @@ public class DragObject : MonoBehaviour
     {
         if (collision.gameObject.tag == "Container")
         {
-            //GetComponent<MeshRenderer>().material = _basicMaterial;
             _outline.enabled = false;
             Match match = Regex.Match(collision.gameObject.name, @"\d+");
             OnEnterContainer(this.gameObject, int.Parse(match.Value) - 1);
@@ -225,7 +212,6 @@ public class DragObject : MonoBehaviour
     {
         if (collision.gameObject.tag == "Container")
         {
-            //GetComponent<MeshRenderer>().material = _detectedMaterial;
             _outline.enabled = true && KeyboardAndJostickController.IsJosticConnected;
             _outline.OutlineColor = Color.yellow;
             Match match = Regex.Match(collision.gameObject.name, @"\d+");
@@ -247,6 +233,7 @@ public class DragObject : MonoBehaviour
 
 
         _outline.enabled = false;
+
         if (_isDragging)
             LetGoItem();
 

@@ -7,44 +7,35 @@ using UnityEngine.InputSystem;
 
 public class GameController : MonoBehaviour
 {
-    private float _maxTime;
+   
+    [SerializeField]
+    private GameObject _city;
 
-    private float _timer;
-
+    [Header("References")]
     [SerializeField]
     private ClientGenerator _clientGenerator;
-    
     [SerializeField]
     private GoodsController _goodsController;
-
     [SerializeField]
     private EndMenuController _endMenuController;
-    
     [SerializeField]
     private MainController  _mainController;
-
     [SerializeField]
     private KeyboardAndJostickController _jostickController;
-
     [SerializeField]
     private QCodeDetecter _qCodeDetecter;
     [SerializeField]
     private SplitController _splitController;
     [SerializeField]
     private FirebaseController _firebaseController;
-    
     [SerializeField]
     private InputKeyboardController _keyboardForJostic;
 
-    [SerializeField]
-    private GameObject _city;
 
-    public bool IsTimerEnded() => _timer < 0;
+    private float _maxTime;
+    private float _timer;
 
-    public float MaxTime => _maxTime;
-    public float AllSum(int index) => _allSum[index];
-
-    private List<GoodInfo>[] _basicGoodsName; //= new List<GoodInfo>();
+    private List<GoodInfo>[] _basicGoodsName; 
     private float[] _sum = new float[KeyboardAndJostickController.MAXPLAYERS], 
         _plusSum = new float[KeyboardAndJostickController.MAXPLAYERS], 
         _minusSum = new float[KeyboardAndJostickController.MAXPLAYERS], 
@@ -54,9 +45,11 @@ public class GameController : MonoBehaviour
 
     private int[] _countClients ;
 
+    public bool IsTimerEnded() => _timer < 0;
+    public float MaxTime => _maxTime;
+    public float AllSum(int index) => _allSum[index];
     public QCodeDetecter QCodeDetecter => _qCodeDetecter;
     public SplitController SplitController => _splitController;
-
     public EndMenuController EndMenuController => _endMenuController;  
     public MainController MainController => _mainController;  
     public FirebaseController FirebaseController => _firebaseController;
@@ -70,18 +63,17 @@ public class GameController : MonoBehaviour
 
     public bool[] IsOpenedPanelUI { get; set; }
 
-    public GoodInfo this[string name, int index = 0] //TODO
+    public GoodInfo this[string name, int index]
     {
         get
         {
-            var list = from good in _basicGoodsName[index]  //_basicGoodsName.Where(n => n.GoodName == name);
+            var list = from good in _basicGoodsName[index]
                        where good.GoodName == name
                        select good;
 
             if (list.Count() == 0)
-            {
                 return null;
-            }
+            
             return list.First();
         }
     }
@@ -108,12 +100,10 @@ public class GameController : MonoBehaviour
 
     public void StartOfTheGame(float maxTime = 60f)
     {
-        this._maxTime = maxTime;
+        _maxTime = maxTime;
         OnStartNewGame();
-        for (int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++)
-        {
+        for (int i = 0; i < KeyboardAndJostickController.GetCountControllers(); i++)
             NextGenerete(i);
-        }
     }
 
     public void SetCityActive(bool status) => _city.SetActive(status); 
@@ -122,23 +112,16 @@ public class GameController : MonoBehaviour
     {
         if (_countClients[index] != 0)
                 EndClient(index);
-        //if (_countClient != 0)
-        //    EndClient();
 
         if (IsTimerEnded())
         {
-            //EndGame(index);
             OnEndGame(index);
             return;
         }
-
-
-
-        _countClients[index]++;
-
         _basicGoodsName[index] = new List<GoodInfo>();
 
-
+        _countClients[index]++;
+        
         _sum[index] = 0;
         _plusSum[index] = 0;
         _minusSum[index] = 0;
@@ -151,7 +134,6 @@ public class GameController : MonoBehaviour
             _sum[index] += good.Price;
         }
         _all[index] = _basicGoodsName[index].Count;
-
         _clientGenerator.SpawnClient(index);
         
     }
@@ -181,14 +163,12 @@ public class GameController : MonoBehaviour
 
     public void OnAddGood(GoodInfo good, int index) 
     {
-        if (_basicGoodsName[index].Remove(this[good.GoodName]) == true)
+        if (_basicGoodsName[index].Remove(this[good.GoodName, index]) == true)
         {
             _allCorect[index]++;
             _plusSum[index] += good.Price;
         } else
-        {
             _minusSum[index] += good.Price;
-        }
     }
 
     public bool GetByCode(string code, int index, out GoodInfo goodInfo)
@@ -201,6 +181,7 @@ public class GameController : MonoBehaviour
             _plusSum[index] += goodInfo.Price;
             return true;
         }
+
         return false;
     }
 
@@ -208,9 +189,7 @@ public class GameController : MonoBehaviour
     {
         var saveSum = _allSum[index];
         foreach (GoodInfo good in _basicGoodsName[index])
-        {
             _minusSum[index] += good.Price;
-        }
 
         _allSum[index] += _plusSum[index] - _minusSum[index];
 
@@ -226,13 +205,10 @@ public class GameController : MonoBehaviour
     private void DeleteAllGoodsOnScene()
     {
         foreach (var good in FindObjectsOfType<GoodInfo>())
-        {
             if (good is not GoodInfoSelect)
-            {
                 Destroy(good.gameObject);
-            }
-        }
     }
+
     private void SetBasicInfo()
     {
 
@@ -240,8 +216,8 @@ public class GameController : MonoBehaviour
             _allSum[i] = 0; 
 
         _timer = _maxTime;
-        _countClients = new int[KeyboardAndJostickController.GetCountGamepads()];
-        _basicGoodsName = new List<GoodInfo>[KeyboardAndJostickController.GetCountGamepads()];
+        _countClients = new int[KeyboardAndJostickController.GetCountControllers()];
+        _basicGoodsName = new List<GoodInfo>[KeyboardAndJostickController.GetCountControllers()];
 
     }
 

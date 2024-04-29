@@ -7,24 +7,22 @@ public class MonitorGoodList : MonoBehaviour
 {
     private List<GoodInfo> _goodList = new List<GoodInfo>();
 
-
     [SerializeField]
     private int index;
     [SerializeField]
     private Image _panelPrefab;
+    [SerializeField]
+    private Transform _goodsInScrollContent;
 
+    [Header("Texts")]
     [SerializeField]
     private TextMeshProUGUI _textName;
     [SerializeField]
     private TextMeshProUGUI _textPrice;
     [SerializeField]
     private TextMeshProUGUI _textSum;
-    [SerializeField]
-    private Transform _goodsInScrollContent;
-
 
     private float _sum;
-
 
     private void Start()
     {
@@ -57,9 +55,7 @@ public class MonitorGoodList : MonoBehaviour
 
         _goodList.Clear();
         foreach(Transform item in _goodsInScrollContent)
-        {
             Destroy(item.gameObject);
-        }
         
         Start();
 

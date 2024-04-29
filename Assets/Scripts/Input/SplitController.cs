@@ -12,16 +12,12 @@ public class SplitController : MonoBehaviour
         if(!set)
         {
             foreach (var item in camers)
-            {
                 item.gameObject.SetActive(false);
-            }
         } else
         {
-            int countCamers = KeyboardAndJostickController.GetCountGamepads();
+            int countCamers = KeyboardAndJostickController.GetCountControllers();
             for(int i = 0; i < countCamers; i++)
-            {
                 camers[i].gameObject.SetActive(true);
-            }
 
 
             switch(countCamers)
@@ -38,7 +34,7 @@ public class SplitController : MonoBehaviour
                     camers[1].rect = new Rect(0.5f, 0f, 0.5f, 0.5f);
                     camers[2].rect = new Rect(0.5f,0.5f, 0.5f, 0.5f);
 
-                    //to create black screen
+                    //to create a black screen
                     camers[3].rect = new Rect(0f, 0f, 0.5f, 0.5f);
                     camers[3].gameObject.SetActive(true);
                     break;
@@ -51,6 +47,5 @@ public class SplitController : MonoBehaviour
 
             }
         }
-
     }
 }

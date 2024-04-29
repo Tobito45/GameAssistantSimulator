@@ -5,7 +5,6 @@ using UnityEngine;
 public class ClientGenerator : MonoBehaviour
 {
     [Header("Parameters")]
-
     [SerializeField]
     private float moveDuration = 1f;
     

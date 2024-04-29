@@ -9,15 +9,11 @@ using UnityEngine;
 public class FirebaseController : MonoBehaviour
 {
     private DatabaseReference _reference;
-
     private List<UserData> _usersData = new List<UserData>();
 
-
-    [Header("Objeccts from scene")]
     [SerializeField]
     private GameObject _content;
 
-    [Header("Prefabs")]
     [SerializeField]
     private GameObject _prefabInfoGameObject;
 
@@ -27,9 +23,7 @@ public class FirebaseController : MonoBehaviour
     public void SetTypeOfSorting(int i)
     {
         foreach (Transform child in _content.transform)
-        {
             Destroy(child.gameObject);
-        }
 
         if (_typeOfSort == (TypeColumnFilter)i)
         {
@@ -41,12 +35,10 @@ public class FirebaseController : MonoBehaviour
 
     public void ChangeFilterDate(int type)
     {
-        //Inspector Unity problem, cant detect enums
+        //Inspector Unity problem, cant detect enums in inspector
         _filterDate = (TypeDateFilter)type; 
         foreach (Transform child in _content.transform)
-        {
             Destroy(child.gameObject);
-        }
     }
     void Start()
     {
@@ -62,7 +54,6 @@ public class FirebaseController : MonoBehaviour
         string json = JsonUtility.ToJson(user);
 
         _reference.Child("users").Child(userId).SetRawJsonValueAsync(json);
-
         Debug.Log("Data saved");
     }
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
@@ -197,7 +188,6 @@ public class UserData
         this.date = date;
     }
 }
-
 
 [System.Serializable]
 public enum TypeDateFilter

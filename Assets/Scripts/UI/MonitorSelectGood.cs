@@ -12,7 +12,6 @@ using UnityEngine.UI;
 public class MonitorSelectGood : MonoBehaviour
 {
     private const float COOLDOWN = 3f;
-    private const int MAX_COUNT_MODES = 2;
     private readonly Vector2 NUMBER_SIZE_NUMBERS_UP_TWO = new Vector2(130, 130);
     private readonly Vector2 NUMBER_SIZE_NUMBERS_DOWN_TWO = new Vector2(250, 250);
 
@@ -32,15 +31,13 @@ public class MonitorSelectGood : MonoBehaviour
     private GameObject _numberPrefab;
   
     private float[] timer = new float[KeyboardAndJostickController.MAXPLAYERS];
-
-    [SerializeField]
-    private MainController _mainController;
-
     private GameObject[] _selectedObject = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
-
     private List<GameObject>[] _objectsWillBeIterated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _indexForIterator = new int[KeyboardAndJostickController.MAXPLAYERS];
 
+    [Header("References")]
+    [SerializeField]
+    private MainController _mainController;
     [SerializeField]
     private MonitorSelectUIPlayerIterator[] _buttonsModes = new MonitorSelectUIPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
     [SerializeField]
@@ -89,8 +86,8 @@ public class MonitorSelectGood : MonoBehaviour
             ActivaeButtonModeWithIterator(i);
 
         }
-        MainController.ForeachAllObjects(_objectsScene.Where(n => n.GetMonitroSelecter != null).Select(n => n.GetMonitroSelecter).ToArray(), (g) => g.SetActive(false));
-        MainController.ForeachAllObjects(_objectsScene.Where(n => n.GetYPanel != null).Select(n => n.GetYPanel).ToArray(), (g) => g.SetActive(true));
+        FunctionsExtensions.ForeachAllObjects(_objectsScene.Where(n => n.GetMonitroSelecter != null).Select(n => n.GetMonitroSelecter).ToArray(), (g) => g.SetActive(false));
+        FunctionsExtensions.ForeachAllObjects(_objectsScene.Where(n => n.GetYPanel != null).Select(n => n.GetYPanel).ToArray(), (g) => g.SetActive(true));
     }
 
     private void Update()
@@ -118,7 +115,7 @@ public class MonitorSelectGood : MonoBehaviour
     {
         foreach (var obj in _buttonsModes.Select(n => n.GetScrollNumberCode))
         {
-            if (KeyboardAndJostickController.GetCountGamepads() > 2)
+            if (KeyboardAndJostickController.GetCountControllers() > 2)
                 obj.GetComponent<GridLayoutGroup>().cellSize = NUMBER_SIZE_NUMBERS_UP_TWO;
             else
                 obj.GetComponent<GridLayoutGroup>().cellSize = NUMBER_SIZE_NUMBERS_DOWN_TWO;
@@ -126,7 +123,7 @@ public class MonitorSelectGood : MonoBehaviour
 
         foreach (var obj in _buttonsModes.Select(n => n.GetScrollSelectedGood))
         {
-            if (KeyboardAndJostickController.GetCountGamepads() > 2)
+            if (KeyboardAndJostickController.GetCountControllers() > 2)
                 obj.GetComponent<GridLayoutGroup>().cellSize = SELECT_SIZE_UP_TWO;
             else
                 obj.GetComponent<GridLayoutGroup>().cellSize = SELECT_SIZE_DOWN_TWO;
@@ -182,7 +179,7 @@ public class MonitorSelectGood : MonoBehaviour
             }
 
 
-            for (int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++)
+            for (int i = 0; i < KeyboardAndJostickController.GetCountControllers(); i++)
             {
                 if (!GameController.Instance.IsOpenedPanelUI[i])
                     continue;
@@ -292,7 +289,7 @@ public class MonitorSelectGood : MonoBehaviour
             _buttonsModes[index].GetTextError.text = "Code does not exists";
             _buttonsModes[index].GetTextError.color = Color.red;
         }
-        StartCoroutine(MainController.MakeActionAfterTime(() => { _buttonsModes[index].GetTextError.gameObject.SetActive(true); }, 
+        StartCoroutine(FunctionsExtensions.MakeActionAfterTime(() => { _buttonsModes[index].GetTextError.gameObject.SetActive(true); }, 
                                              () => { _buttonsModes[index].GetTextError.gameObject.SetActive(false); }, 2f));
         _buttonsModes[index].GetInputFieldNumber.text = null;
     }

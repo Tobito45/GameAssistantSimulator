@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class RotateController : MonoBehaviour
 {
-    private const float rotationSpeed = 150f;
+    [SerializeField]
+    private float rotationSpeed = 150f;
 
     private GameObject[] _objectsRotate = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
     public IEnumerable<GameObject> ObjectRotate => _objectsRotate;
@@ -25,8 +26,8 @@ public class RotateController : MonoBehaviour
                 continue;
             }
 
-            float horizontalInput = 0;//Input.GetAxis("Horizontal");
-            float verticalInput = 0;// Input.GetAxis("Vertical");
+            float horizontalInput = 0;
+            float verticalInput = 0;
             horizontalInput = -KeyboardAndJostickController.GetRotate(DragObject(i).Index).horizontal;
             verticalInput = KeyboardAndJostickController.GetRotate(DragObject(i).Index).vertical;
 
@@ -36,7 +37,6 @@ public class RotateController : MonoBehaviour
             if (_objectsRotate[i] != null)
             {
                 _objectsRotate[i].transform.Rotate(0f, horizontalInput * rotationAmount, 0f, Space.World);
-
                 _objectsRotate[i].transform.Rotate(verticalInput * rotationAmount, 0f, 0f, Space.World);
             }
         }

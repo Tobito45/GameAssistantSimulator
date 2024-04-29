@@ -7,30 +7,23 @@ public class TutorialChangerImages : MonoBehaviour
 {
     [SerializeField]
     private Sprite _josticImage;
-
     [SerializeField]
     private Sprite _keyBoardImage;
 
     private Image _image;
 
-    void Awake()
-    {
+    void Awake() =>
         _image = GetComponent<Image>();
-    }
 
-    private void Start()
-    {
+    private void Start() =>
         GameController.Instance.OnStartNewGame += OnEnable;
-    }
 
     private void OnEnable()
     {
         if (KeyboardAndJostickController.IsJosticConnected)
             _image.sprite = _josticImage;
         else
-        {
             _image.sprite = _keyBoardImage;
-        }
 
         if (_image.sprite == null)
             _image.color = new Color(1, 1, 1, 0);

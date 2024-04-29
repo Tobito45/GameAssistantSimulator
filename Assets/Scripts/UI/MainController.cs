@@ -11,11 +11,19 @@ using UnityEngine.UI;
 
 public class MainController : MonoBehaviour
 {
-    private const float basicTime = 60f;
+    private const float BASIC_TIME = 60f;
     private const float TIMER_BOARDER_FOR_MENU_ITERATION = 0.2f;
+
+    [SerializeField]
+    private Camera _mainCamera;
+
     [Header("Panels")]
     [SerializeField]
-    private GameObject _panelMenu, _rankPanel, _backgroundImage;
+    private GameObject _panelMenu;
+    [SerializeField]
+    private GameObject _rankPanel;
+    [SerializeField]
+    private GameObject _backgroundImage;
 
     [Header("InputFields")]
     [SerializeField]
@@ -29,9 +37,7 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI textInfo;
 
-    [SerializeField]
-    private Camera _mainCamera;
-
+    [Header("References")]
     [SerializeField]
     private MainObjectsPlayerIterator[] _playerObjects = new MainObjectsPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
 
@@ -49,15 +55,15 @@ public class MainController : MonoBehaviour
         for (int i = 0; i < _outlines.Length; i++)
             _outlines[i] = new List<GameObject>();
 
-        _inputField.text = basicTime.ToString();
+        _inputField.text = BASIC_TIME.ToString();
         _startGameButton.onClick.AddListener(() => GameController.Instance.StartOfTheGame(float.Parse(_inputField.text)));
         textInfo.text = $"Today: {DateTime.Now.Day}.{DateTime.Now.Month} \nVersion: {Application.version}";
         _mainCamera.gameObject.SetActive(true);
         GameController.Instance.SplitController.SetActiveCamers(false);
 
         _panelMenu.SetActive(true);
-        ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
-        ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(false); });
+        FunctionsExtensions.ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
+        FunctionsExtensions.ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(false); });
         GameController.Instance.SetCityActive(true);
 
         ActivateMenuControllingJostic(0);
@@ -121,13 +127,13 @@ public class MainController : MonoBehaviour
         
         _mainCamera.gameObject.SetActive(false);
         GameController.Instance.SplitController.SetActiveCamers(true);
-
         _panelMenu.SetActive(false);
-        if(KeyboardAndJostickController.GetCountGamepads() != 4)
+        if(KeyboardAndJostickController.GetCountControllers() != 4)
             _backgroundImage.SetActive(true);
+
         ClearMenuControllingJostic(0);
-        ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(true); });
-        ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(true); });
+        FunctionsExtensions.ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(true); });
+        FunctionsExtensions.ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(true); });
         GameController.Instance.SetCityActive(false);
 
 
@@ -135,17 +141,16 @@ public class MainController : MonoBehaviour
 
     private void Update()
     {
-        for(int i = 0; i < KeyboardAndJostickController.GetCountGamepads(); i++) 
-        {
+        for(int i = 0; i < KeyboardAndJostickController.GetCountControllers(); i++) 
             GameController.Instance.SetTextTimer(_playerObjects[i].GetTextTimer, i);
-        }
+        
         MenuControllerJostic();
         
     }
 
     private void MenuControllerJostic()
     {
-        for (int index = 0; index < KeyboardAndJostickController.GetCountGamepads(); index++)
+        for (int index = 0; index < KeyboardAndJostickController.GetCountControllers(); index++)
         {
             //moving iterator
             MovingInMenuUsingJostick(index); 
@@ -162,10 +167,8 @@ public class MainController : MonoBehaviour
                     //getting component TMP_InputField
                     TMP_InputField inputField = selectedObj.GetComponentInChildren<TMP_InputField>(); 
                     if (button)
-                    {
                         //execution of button method
                         button.onClick.Invoke(); 
-                    }
                     else if (inputField)
                     {
                         if (inputField.contentType == TMP_InputField.ContentType.IntegerNumber)
@@ -185,9 +188,8 @@ public class MainController : MonoBehaviour
                             GameController.Instance.KeyBoardForJostic.OnSelected[index] += (c) =>
                             {
                                 if (c == 'D' && inputField.text.Length > 0)
-                                {
                                     inputField.text = inputField.text.Substring(0, inputField.text.Length - 1);
-                                } else 
+                                else 
                                     inputField.text += c.ToString();
                             };
                         }
@@ -222,10 +224,8 @@ public class MainController : MonoBehaviour
                 if (vertical != 0)
                 {
                     if (_outLineIndex[index] == -1)
-                    {
                         //setting to first value of list
                         _outLineIndex[index] = 0; 
-                    }
                     else
                     {
                         //disabling Outline
@@ -259,50 +259,31 @@ public class MainController : MonoBehaviour
             timer[index] -= Time.deltaTime; 
     }
 
-    public static void ForeachAllObjects<T>(T[] objects, Action<T> action)
-    {
-        foreach(T obj in objects)
-            action(obj);
-    }
-
-    public static IEnumerator MakeActionAfterTime(Action actionBefore, Action actionAfter, float duraction)
-    {
-        actionBefore();
-        yield return new WaitForSeconds(duraction);
-        actionAfter();
-    }
-
 
     public void OnItemAdded(int index, float score, bool isPlus)
     {
         _playerObjects[index].GetTextScore.text = $"Score: {score:F2}";
         var colourSafe = _playerObjects[index].GetTextScore.color;
         if (isPlus)
-        {
-           StartCoroutine(MakeActionAfterTime(() => _playerObjects[index].GetTextScore.color = Color.green,
+            StartCoroutine(FunctionsExtensions.MakeActionAfterTime(() => _playerObjects[index].GetTextScore.color = Color.green,
                                 () => _playerObjects[index].GetTextScore.color = colourSafe, 2));
-        } else
-        {
-            StartCoroutine(MakeActionAfterTime(() => _playerObjects[index].GetTextScore.color = Color.red,
+        else
+            StartCoroutine(FunctionsExtensions.MakeActionAfterTime(() => _playerObjects[index].GetTextScore.color = Color.red,
                                 () => _playerObjects[index].GetTextScore.color = colourSafe, 2));
-        }
     }
 
     public void OpenMenuAndCloseGame()
     {
         _panelMenu.SetActive(true);
-        ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
-        ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(false); });
-        GameController.Instance.SetCityActive(true);
-        _backgroundImage.SetActive(false);
-
+        FunctionsExtensions.ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(false); });
+        FunctionsExtensions.ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(false); });
         ActivateMenuControllingJostic(0);
         
-
+        GameController.Instance.SetCityActive(true);
         GameController.Instance.SplitController.SetActiveCamers(false);
-
-        _mainCamera.gameObject.SetActive(true);
         
+        _backgroundImage.SetActive(false);
+        _mainCamera.gameObject.SetActive(true);
     }
     public void Exit() => Application.Quit();
 }
@@ -312,13 +293,10 @@ class MainObjectsPlayerIterator
 {
     [SerializeField]
     private GameObject _canvasGame;
-
     [SerializeField]
     private GameObject _panelGame;
-
     [SerializeField]
     private TextMeshProUGUI _textTimer, _textScore;
-
 
     public GameObject GetPanelGame => _panelGame;
     public GameObject GetCanvasPanel => _canvasGame;
