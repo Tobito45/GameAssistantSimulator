@@ -165,13 +165,13 @@ public class GameController : MonoBehaviour
     {
         if (IsTimerEnded())
         {
-            if (_countClients != null && _countClients.Count() > 0  && _countClients[index] == 0)
+            if (_countClients != null && _countClients.Count() > 0 && index < _countClients.Count()  && _countClients[index] == 0)
             {
-                text.text = $"Time is left! Waiting for other players";
+                text.text = $"Waiting for others";
                 return;
             }
 
-            text.text = $"Time is left! This is your last client";
+            text.text = $"This is last client";
             return;
         }
         text.text = $"Time left: {_timer.ToString("F2")}";

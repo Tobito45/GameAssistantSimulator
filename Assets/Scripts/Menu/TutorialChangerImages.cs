@@ -15,7 +15,12 @@ public class TutorialChangerImages : MonoBehaviour
 
     void Awake()
     {
-        _image = GetComponent<Image>(); 
+        _image = GetComponent<Image>();
+    }
+
+    private void Start()
+    {
+        GameController.Instance.OnStartNewGame += OnEnable;
     }
 
     private void OnEnable()

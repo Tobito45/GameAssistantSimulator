@@ -22,7 +22,7 @@ public class EndMenuController : MonoBehaviour
     private MainController _mainController;
 
     [SerializeField]
-    private EndMenuObjectsPlayerIterrator[] _objectScene = new EndMenuObjectsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    private EndMenuObjectsPlayerIterator[] _objectScene = new EndMenuObjectsPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
 
     public bool IsEndPanelActive(int index) => _objectScene[index].GetPanelEnd.activeInHierarchy;
 
@@ -44,7 +44,7 @@ public class EndMenuController : MonoBehaviour
     public void AddElementToEnd(int clientNumber, int countGoods, int correctGoods, float minusMoney, float plusMoney, float allSum, int index)
     {
         var obj = Instantiate(_panelEndInfoPrefab, _objectScene[index].GetScrollContent.transform);
-        obj.transform.Find("ClientName").GetComponent<TextMeshProUGUI>().text = $"{clientNumber:F2} - Client";
+        obj.transform.Find("ClientName").GetComponent<TextMeshProUGUI>().text = $"Shopper {clientNumber}";
         obj.transform.Find("GoodsNumbers").GetComponent<TextMeshProUGUI>().text = $"{correctGoods:F2}/{countGoods:F2}";
         obj.transform.Find("GoodMinusPrice").GetComponent<TextMeshProUGUI>().text = $"-{minusMoney:F2}";
         obj.transform.Find("GoodPlusPrice").GetComponent<TextMeshProUGUI>().text = $"+{plusMoney:F2}";
@@ -70,7 +70,7 @@ public class EndMenuController : MonoBehaviour
 
     public void AktualText(float sum, int index)
     {
-        _objectScene[index].GetTextScope.text = $"Your scope: {sum.ToString("F2")}";
+        _objectScene[index].GetTextScope.text = $"score: {sum.ToString("F2")}";
     }
     public void ClosePanelEnd()
     {
@@ -132,7 +132,7 @@ public class EndMenuController : MonoBehaviour
 }
 
 [System.Serializable]
-class EndMenuObjectsPlayerIterrator
+class EndMenuObjectsPlayerIterator
 {
     [SerializeField]
     private GameObject _panelEnd, _panelInputName, _saveButton;

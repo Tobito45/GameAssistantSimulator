@@ -5,25 +5,32 @@ using UnityEngine;
 
 public class DragObject : MonoBehaviour
 {
-    public static float BOARDERTOLETGOGOOD = -2.1f;
-    public static float BOARDERCANOTMOVE = -1.95f;
+    public static float BOARDER_TO_LET_GO_GOOD = -2.1f;
+    public static float BOARDER_CANNOT_MOVE = -1.95f;
 
 
+    [Header("GameObjects")]
     [SerializeField]
     private GameObject _qCodeObject;
-
     [SerializeField]
     private TextMeshPro _textQrCode;
 
-    private const float koef_mouse_pos = 0.045f;
-    private const float SPEED = 0.5f;
-    private RotateController _rotateController;
-    private Rigidbody _rigidbody;
-    private Material _basicMaterial;
-    private Outline _outline;
+    [Header("Materials")]
+    [SerializeField]
+    private Material _detectedMaterial;
 
     [SerializeField]
-    private Material _detectedMaterial, _selectedMaterial;
+    private Material _selectedMaterial;
+
+    private const float koef_mouse_pos = 0.045f;
+    private const float speed = 0.5f;
+    private RotateController _rotateController;
+    private Rigidbody _rigidbody;
+    private Outline _outline;
+
+   
+
+
     private GoodInfo _good;
     private bool _isDragging = false;
     private Vector3 _offset;
@@ -128,7 +135,7 @@ public class DragObject : MonoBehaviour
         if (_isActualGameIsEnd)
             return;
 
-        if (transform.position.y < BOARDERTOLETGOGOOD && _outline.enabled)//GetComponent<MeshRenderer>().material != _basicMaterial)
+        if (transform.position.y < BOARDER_TO_LET_GO_GOOD && _outline.enabled)//GetComponent<MeshRenderer>().material != _basicMaterial)
         {
             OnLetGoGood(this, Index);
             // GetComponent<MeshRenderer>().material = _basicMaterial;
@@ -161,17 +168,17 @@ public class DragObject : MonoBehaviour
         {
             input = KeyboardAndJostickController.GetMovement(Index);
 
-            if (transform.position.y + input.vertical * Time.deltaTime < BOARDERCANOTMOVE && input.vertical < 0)
+            if (transform.position.y + input.vertical * Time.deltaTime < BOARDER_CANNOT_MOVE && input.vertical < 0)
                 input.vertical = 0;
 
-            transform.position += new Vector3(input.horizontal, input.vertical, 0) * SPEED * Time.deltaTime;
+            transform.position += new Vector3(input.horizontal, input.vertical, 0) * speed * Time.deltaTime;
         }
         else
         {
             Vector3 mousePos = GetMouseWorldPosition();
             input = (mousePos.x,mousePos.y);
 
-            if (input.vertical + _offset.y < BOARDERCANOTMOVE)
+            if (input.vertical + _offset.y < BOARDER_CANNOT_MOVE)
                 transform.position = new Vector3(input.horizontal + _offset.x, transform.position.y, transform.position.z);
             else
                 transform.position = new Vector3(input.horizontal + _offset.x, input.vertical + _offset.y, transform.position.z);
@@ -239,7 +246,6 @@ public class DragObject : MonoBehaviour
             return;
 
 
-        Debug.Log(gameObject.name);
         _outline.enabled = false;
         if (_isDragging)
             LetGoItem();

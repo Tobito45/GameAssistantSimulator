@@ -26,7 +26,7 @@ public class GoodsController : MonoBehaviour
     private bool[] _lockAutoPay = new bool[KeyboardAndJostickController.MAXPLAYERS];
 
     [SerializeField]
-    private GoodsPlayerIterrator[] _UIPlayerElements = new GoodsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    private GoodsPlayerIterator[] _UIPlayerElements = new GoodsPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
 
     private void Start()
     {
@@ -243,7 +243,7 @@ public class GoodsController : MonoBehaviour
 
 
 [System.Serializable]
-class GoodsPlayerIterrator
+class GoodsPlayerIterator
 {
     [SerializeField]
     private Transform _pointerCreate;

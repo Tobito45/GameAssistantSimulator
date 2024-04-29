@@ -12,12 +12,10 @@ using UnityEngine.UI;
 public class MainController : MonoBehaviour
 {
     private const float basicTime = 60f;
-    private const float TIMERBOARDERFORMENUITERATION = 0.2f;
+    private const float TIMER_BOARDER_FOR_MENU_ITERATION = 0.2f;
     [Header("Panels")]
     [SerializeField]
     private GameObject _panelMenu, _rankPanel, _backgroundImage;
-   // [SerializeField]
-   // private GameObject[] _panelGame;
 
     [Header("InputFields")]
     [SerializeField]
@@ -31,14 +29,11 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI textInfo;
 
-    //[SerializeField]
-   // private TextMeshProUGUI[] _textTimer, _textScore;
-
     [SerializeField]
     private Camera _mainCamera;
 
     [SerializeField]
-    private MainObjectsPlayerIterrator[] _playerObjects = new MainObjectsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    private MainObjectsPlayerIterator[] _playerObjects = new MainObjectsPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
 
     private List<GameObject>[] _outlines = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _outLineIndex = new int[KeyboardAndJostickController.MAXPLAYERS];
@@ -128,7 +123,8 @@ public class MainController : MonoBehaviour
         GameController.Instance.SplitController.SetActiveCamers(true);
 
         _panelMenu.SetActive(false);
-        _backgroundImage.SetActive(true);
+        if(KeyboardAndJostickController.GetCountGamepads() != 4)
+            _backgroundImage.SetActive(true);
         ClearMenuControllingJostic(0);
         ForeachAllObjects(_playerObjects.Where(n => n.GetPanelGame != null).Select(n => n.GetPanelGame).ToArray(), (obj) => { obj.SetActive(true); });
         ForeachAllObjects(_playerObjects.Where(n => n.GetCanvasPanel != null).Select(n => n.GetCanvasPanel).ToArray(), (obj) => { obj.SetActive(true); });
@@ -149,7 +145,7 @@ public class MainController : MonoBehaviour
 
     private void MenuControllerJostic()
     {
-        for (int index = 0; index < KeyboardAndJostickController.GetCountGamepads();index++)
+        for (int index = 0; index < KeyboardAndJostickController.GetCountGamepads(); index++)
         {
             //moving iterator
             MovingInMenuUsingJostick(index); 
@@ -237,8 +233,8 @@ public class MainController : MonoBehaviour
                         if (vertical < 0)
                         {
                             //setting limit to timer
-                            timer[index] = TIMERBOARDERFORMENUITERATION;
-                            //increasing iterrator
+                            timer[index] = TIMER_BOARDER_FOR_MENU_ITERATION;
+                            //increasing iterator
                             _outLineIndex[index]++; 
                             if (_outLineIndex[index] > _outlines[index].Count - 1)
                                 _outLineIndex[index] = 0;
@@ -246,8 +242,8 @@ public class MainController : MonoBehaviour
                         else if (vertical > 0)
                         {
                             //setting limit to timer 
-                            timer[index] = TIMERBOARDERFORMENUITERATION;
-                            //decreasing iterrator
+                            timer[index] = TIMER_BOARDER_FOR_MENU_ITERATION;
+                            //decreasing iterator
                             _outLineIndex[index]--; 
                             if (_outLineIndex[index] < 0)
                                 _outLineIndex[index] = _outlines[index].Count - 1;
@@ -312,7 +308,7 @@ public class MainController : MonoBehaviour
 }
 
 [System.Serializable]
-class MainObjectsPlayerIterrator
+class MainObjectsPlayerIterator
 {
     [SerializeField]
     private GameObject _canvasGame;

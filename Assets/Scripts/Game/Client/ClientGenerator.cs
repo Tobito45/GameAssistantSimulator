@@ -4,11 +4,23 @@ using System.Collections.Generic;
 using UnityEngine;
 public class ClientGenerator : MonoBehaviour
 {
-    private const float moveDuration = 1f;
-    private const float rotationSpeed = 260f;
-    private const float targetWalk = 0f;
+    [Header("Parameters")]
+
+    [SerializeField]
+    private float moveDuration = 1f;
+    
+    [SerializeField]
+    private float rotationSpeed = 260f;
+    [SerializeField] 
+    private float targetWalk = 0f;
+
+    [SerializeField]
     private const float targetOut = -90f;
+    
+    [SerializeField]
     private const float timeBetween = 0.1f;
+
+    [SerializeField]
     private const float timeToWait = 2;
 
     private List<Coroutine>[] activeCoroutines = new List<Coroutine>[KeyboardAndJostickController.MAXPLAYERS];
@@ -25,15 +37,11 @@ public class ClientGenerator : MonoBehaviour
     private GameObject[] _aktualClient = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
 
     [Header("Way")]
-    //public InspectorArray<Transform[]>[] wayPoints;
     private Transform[] _aktualTransform = new Transform[KeyboardAndJostickController.MAXPLAYERS];
     private bool _isRotating = false;
 
-    //[SerializeField]
-    //private Transform[] _spawnTransform;
-    
     [SerializeField]
-    private ClientGeneratorPlayerIterrator[] _transformClientInfo = new ClientGeneratorPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    private ClientGeneratorPlayerIterator[] _transformClientInfo = new ClientGeneratorPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
 
 
     public event Action OnClientDestroy;
@@ -120,16 +128,13 @@ public class ClientGenerator : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
 
-            // Вычисляем прогресс перемещения в диапазоне от 0 до 1
             float t = Mathf.Clamp01(elapsedTime / moveDuration);
 
-            // Интерполируем позицию объекта по ходу времени
             objToMove.transform.position = Vector3.Lerp(startPosition, target.position, t);
 
             yield return null;
         }
 
-        // Убеждаемся, что объект точно достиг целевой точки
         objToMove.transform.position = target.position;
         if (_aktualClient[index].GetComponent<Animator>() != null)
             _aktualClient[index].GetComponent<Animator>().SetBool("Walk", false);
@@ -141,26 +146,22 @@ public class ClientGenerator : MonoBehaviour
     {
         _isRotating = true;
         Quaternion startRotation = objectRotate.transform.rotation;
-        Quaternion targetRotation = Quaternion.Euler(0f, target, 0f); // Целевой поворот по заданному углу
+        Quaternion targetRotation = Quaternion.Euler(0f, target, 0f);
         float elapsedTime = 0f;
 
         while (objectRotate != null && elapsedTime < Mathf.Abs(target - objectRotate.transform.eulerAngles.y) / rotationSpeed)
         {
             elapsedTime += Time.deltaTime;
 
-            // Вычисляем прогресс поворота в диапазоне от 0 до 1
             float t = Mathf.Clamp01(elapsedTime / (Mathf.Abs(target - objectRotate.transform.eulerAngles.y) / rotationSpeed));
 
-            // Интерполируем вращение объекта по ходу времени
             objectRotate.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, t);
 
             yield return null;
         }
 
-
-        // Убеждаемся, что объект точно завершил поворот к целевому углу
         if(objectRotate != null)
-        objectRotate.transform.rotation = targetRotation;
+            objectRotate.transform.rotation = targetRotation;
         _isRotating = false;
     }
     private void StopAllCoroutinesExceptCurrent(int index)
@@ -173,7 +174,7 @@ public class ClientGenerator : MonoBehaviour
             }
         }
 
-        activeCoroutines[index].Clear(); // Очистка списка активных корутин
+        activeCoroutines[index].Clear();
     }
 
     public void ClientPayed(int index)
@@ -184,18 +185,7 @@ public class ClientGenerator : MonoBehaviour
 }
 
 [System.Serializable]
-public class InspectorArray<T>
-{
-    [SerializeField]
-    private T elements;
-
-    public T GetElements => elements;
-
-}
-
-
-[System.Serializable]
-class ClientGeneratorPlayerIterrator
+class ClientGeneratorPlayerIterator
 {
     [SerializeField]
     private Transform[] _wayPoints;

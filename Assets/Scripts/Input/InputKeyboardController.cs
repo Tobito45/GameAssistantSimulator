@@ -17,7 +17,7 @@ public class InputKeyboardController : MonoBehaviour
     public Action[] OnDisable = new Action[KeyboardAndJostickController.MAXPLAYERS];
 
     private float[] timer = new float[KeyboardAndJostickController.MAXPLAYERS];
-    private List<GameObject>[] _objectsWillBeIterrated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
+    private List<GameObject>[] _objectsWillBeIterated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _indexForIterator = new int[KeyboardAndJostickController.MAXPLAYERS];
     private GameObject[] _selectedObject = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
 
@@ -30,7 +30,7 @@ public class InputKeyboardController : MonoBehaviour
         for (int i = 0; i < _keyboard.Length; i++)
         {
             _layoutGroup[i] = _keyboard[i].GetComponent<GridLayoutGroup>();
-            _objectsWillBeIterrated[i] = new List<GameObject>();
+            _objectsWillBeIterated[i] = new List<GameObject>();
         }
         GameController.Instance.OnStartNewGame += OnStartOfGame;
 
@@ -88,7 +88,7 @@ public class InputKeyboardController : MonoBehaviour
                 var obj = Instantiate(_prefabForCreate, _keyboard[i].transform);
                 obj.GetComponentInChildren<TextMeshProUGUI>().text = c.ToString();
                 obj.GetComponentInChildren<Button>().onClick.AddListener(() => { OnSelected[index](c); });
-                _objectsWillBeIterrated[index].Add(obj);
+                _objectsWillBeIterated[index].Add(obj);
             }
         }
     }
@@ -136,12 +136,12 @@ public class InputKeyboardController : MonoBehaviour
                 }
                 else if (movement.vertical > 0.25f)
                 {
-                    NextObjectSelect(i, -_objectsWillBeIterrated[i].Count / _movementConst[i]);
+                    NextObjectSelect(i, -_objectsWillBeIterated[i].Count / _movementConst[i]);
 
                 }
                 else if (movement.vertical < -0.25f)
                 {
-                    NextObjectSelect(i, _objectsWillBeIterrated[i].Count / _movementConst[i]);
+                    NextObjectSelect(i, _objectsWillBeIterated[i].Count / _movementConst[i]);
                 }
                 timer[i] = 0.05f;
             }
@@ -155,17 +155,14 @@ public class InputKeyboardController : MonoBehaviour
     private void NextObjectSelect(int index, int countAdd = 1)
     {
         _indexForIterator[index] += countAdd;
-        /* if (_indexForIterator[index] >= _objectsWillBeIterrated[index].Count)
-         {
-             _indexForIterator[index] = 0;
-         }*/
-        if (_indexForIterator[index] >= _objectsWillBeIterrated[index].Count || _indexForIterator[index] < 0)
+
+        if (_indexForIterator[index] >= _objectsWillBeIterated[index].Count || _indexForIterator[index] < 0)
         {
             _indexForIterator[index] -= countAdd;
         }
         if (_indexForIterator[index] < 0)
             _indexForIterator[index] = 0;
-        OnSelectObject(_objectsWillBeIterrated[index][_indexForIterator[index]], index);
+        OnSelectObject(_objectsWillBeIterated[index][_indexForIterator[index]], index);
 
     }
 

@@ -38,13 +38,13 @@ public class MonitorSelectGood : MonoBehaviour
 
     private GameObject[] _selectedObject = new GameObject[KeyboardAndJostickController.MAXPLAYERS];
 
-    private List<GameObject>[] _objectsWillBeIterrated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
+    private List<GameObject>[] _objectsWillBeIterated = new List<GameObject>[KeyboardAndJostickController.MAXPLAYERS];
     private int[] _indexForIterator = new int[KeyboardAndJostickController.MAXPLAYERS];
 
     [SerializeField]
-    private MonitorSelectUIPlayerIterrator[] _buttonsModes = new MonitorSelectUIPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    private MonitorSelectUIPlayerIterator[] _buttonsModes = new MonitorSelectUIPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
     [SerializeField]
-    private MonitorSelectSceneObjectsPlayerIterrator[] _objectsScene = new MonitorSelectSceneObjectsPlayerIterrator[KeyboardAndJostickController.MAXPLAYERS];
+    private MonitorSelectSceneObjectsPlayerIterator[] _objectsScene = new MonitorSelectSceneObjectsPlayerIterator[KeyboardAndJostickController.MAXPLAYERS];
 
     public Action<int> AfterPay;
 
@@ -79,7 +79,12 @@ public class MonitorSelectGood : MonoBehaviour
                 var obj = Instantiate(_numberPrefab, _buttonsModes[i].GetScrollNumberCode.transform);
                 obj.GetComponentInChildren<TextMeshProUGUI>().text = j.ToString();
                 int index = i;
-                obj.GetComponentInChildren<Button>().onClick.AddListener(() => OnSelectObject(obj.gameObject, index)); //_buttonsModes[index].GetInputFieldNumber.text += j.ToString()
+                obj.GetComponentInChildren<Button>().onClick.AddListener(() => {
+                    OnSelectObject(obj.gameObject, index);
+                    if (!KeyboardAndJostickController.IsJosticConnected)
+                        OnApply(0);
+
+                }); 
             }
             ActivaeButtonModeWithIterator(i);
 
@@ -196,12 +201,12 @@ public class MonitorSelectGood : MonoBehaviour
                     }
                     else if (movement.vertical > 0.25f)
                     {
-                        NextObjectSelect(i, -_objectsWillBeIterrated[i].Count / _buttonsModes[i].GetKoeficent);
+                        NextObjectSelect(i, -_objectsWillBeIterated[i].Count / _buttonsModes[i].GetKoeficent);
 
                     }
                     else if (movement.vertical < -0.25f)
                     {
-                        NextObjectSelect(i, _objectsWillBeIterrated[i].Count / _buttonsModes[i].GetKoeficent);
+                        NextObjectSelect(i, _objectsWillBeIterated[i].Count / _buttonsModes[i].GetKoeficent);
                     }
                     timer[i] = 0.07f;
                 }
@@ -216,7 +221,7 @@ public class MonitorSelectGood : MonoBehaviour
     public void ActivaeButtonModeWithIterator(int index)
     {
         _buttonsModes[index].NextButton().onClick?.Invoke();
-        _objectsWillBeIterrated[index] = _buttonsModes[index].GetObjectsToIterate();
+        _objectsWillBeIterated[index] = _buttonsModes[index].GetObjectsToIterate();
         _indexForIterator[index] = -1;
         NextObjectSelect(index);
     }
@@ -237,11 +242,11 @@ public class MonitorSelectGood : MonoBehaviour
     private void NextObjectSelect(int index, int countAdd = 1)
     {
         _indexForIterator[index] += countAdd;
-        if (_indexForIterator[index] >= _objectsWillBeIterrated[index].Count || _indexForIterator[index] < 0)
+        if (_indexForIterator[index] >= _objectsWillBeIterated[index].Count || _indexForIterator[index] < 0)
         {
             _indexForIterator[index] -= countAdd;
         }
-        OnSelectObject(_objectsWillBeIterrated[index][_indexForIterator[index]], index);
+        OnSelectObject(_objectsWillBeIterated[index][_indexForIterator[index]], index);
 
     }
 
@@ -331,7 +336,7 @@ class SelectedDataJson
 }
 
 [System.Serializable]
-class MonitorSelectSceneObjectsPlayerIterrator
+class MonitorSelectSceneObjectsPlayerIterator
 {
     [SerializeField]
     private MonitorGoodList _goodList;
@@ -348,7 +353,7 @@ class MonitorSelectSceneObjectsPlayerIterrator
 
 
 [System.Serializable]
-class MonitorSelectUIPlayerIterrator
+class MonitorSelectUIPlayerIterator
 {
     [SerializeField]
     private List<GameObject> _buttons;

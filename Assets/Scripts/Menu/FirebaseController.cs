@@ -10,7 +10,6 @@ public class FirebaseController : MonoBehaviour
 {
     private DatabaseReference _reference;
 
-    // private Dictionary<string, UserData> _usersData = new Dictionary<string, UserData>();
     private List<UserData> _usersData = new List<UserData>();
 
 
@@ -42,7 +41,8 @@ public class FirebaseController : MonoBehaviour
 
     public void ChangeFilterDate(int type)
     {
-        _filterDate = (TypeDateFilter)type; //Inspector Unity problem, cant detect enums
+        //Inspector Unity problem, cant detect enums
+        _filterDate = (TypeDateFilter)type; 
         foreach (Transform child in _content.transform)
         {
             Destroy(child.gameObject);
@@ -77,22 +77,20 @@ public class FirebaseController : MonoBehaviour
 
         if (args.Snapshot != null && args.Snapshot.ChildrenCount > 0)
         {
-            for (int i = 0; i < args.Snapshot.Children.Count(); i++)//foreach (var childSnapshot in args.Snapshot.Children)
+            for (int i = 0; i < args.Snapshot.Children.Count(); i++)
             {
-                //   string userId = childSnapshot.Key;                 
-                Dictionary<string, object> userData = (Dictionary<string, object>)args.Snapshot.Children.ElementAt(i).Value; //(Dictionary<string, object>)childSnapshot[i].Value;
+                Dictionary<string, object> userData = (Dictionary<string, object>)args.Snapshot.Children.ElementAt(i).Value;
                 string username = userData["username"].ToString();
                 float score = (float)Convert.ToDouble(userData["score"]);
                 int time = Convert.ToInt32(userData["time"]);
                 string date = userData["date"].ToString();
 
-                //_usersData[userId] = new UserData(username, score, time, date);
                 _usersData.Add(new UserData(username, score, time, date));
             }
         }
     }
 
-    public void MakeDictionarySorted(ref List<UserData> userData)
+    private void MakeListSorted(ref List<UserData> userData)
     {
         switch (_typeOfSort)
         {
@@ -113,7 +111,7 @@ public class FirebaseController : MonoBehaviour
         }
     }
 
-    public List<UserData> MakeDictionaryNecessaryDate(List<UserData> userData)
+    private List<UserData> MakeListNecessaryDateSorted(List<UserData> userData)
     {
         int saveCount = userData.Count;
         List<UserData> savedUserData = null;
@@ -138,11 +136,13 @@ public class FirebaseController : MonoBehaviour
                 }).ToList();
                 break;
             case TypeDateFilter.Month:
+                int todayMonth = DateTime.Today.Month;
+                int todayYear = DateTime.Today.Year;
                 savedUserData = userData.Where((n) =>
                 {
                     //Calculation the month of year
                     DateTime dateToCheck = DateTime.ParseExact(n.date, "dd.MM.yyyy H:mm:ss", CultureInfo.InvariantCulture).Date;
-                    return dateToCheck.Month == DateTime.Today.Month && dateToCheck.Year == DateTime.Today.Year;
+                    return dateToCheck.Month == todayMonth && dateToCheck.Year == todayYear;
                 }).ToList();
                 break;
             case TypeDateFilter.Year:
@@ -164,10 +164,10 @@ public class FirebaseController : MonoBehaviour
             Destroy(child.gameObject);
 
         //filtering by name/score/time/date
-        MakeDictionarySorted(ref _usersData);
+        MakeListSorted(ref _usersData);
 
         //filtering by time period
-        var dateFilteredData = MakeDictionaryNecessaryDate(_usersData); 
+        var dateFilteredData = MakeListNecessaryDateSorted(_usersData); 
 
         //createting new one
         foreach (var userData in dateFilteredData) 

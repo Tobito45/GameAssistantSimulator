@@ -6,11 +6,11 @@ public class CameraMainFollow : MonoBehaviour
     private readonly Vector3 rotationAxis = Vector3.up;
 
     [SerializeField]
-    private Transform _targetObject;
+    private Transform _targetLookObject, _targetRotateObject;
 
     private void Update()
     {
-       transform.RotateAround(_targetObject.position, rotationAxis, rotationSpeed * Time.deltaTime);
-       transform.LookAt(_targetObject);
+       transform.RotateAround(_targetRotateObject.position, rotationAxis, rotationSpeed * Time.deltaTime);
+       transform.LookAt(_targetLookObject);
     }
 }
