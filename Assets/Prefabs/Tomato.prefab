@@ -130,6 +130,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c1b59507ce82045ac92810aeff731c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  koef_mouse_pos: 0.045
+  speed: 0.5
   _qCodeObject: {fileID: 6786624403546167358}
   _textQrCode: {fileID: 7431586141239597350}
   _detectedMaterial: {fileID: 2100000, guid: cea0c4191eb5cb440aa5355d44958681, type: 2}
@@ -348,7 +350,7 @@ Transform:
   m_GameObject: {fileID: 6786624403546167358}
   m_LocalRotation: {x: -0.50623745, y: 0.17677623, z: 0.047366895, w: 0.8427516}
   m_LocalPosition: {x: -0.06, y: 0.1113, z: -0.158}
-  m_LocalScale: {x: 0.03534, y: 0.011790001, z: 0.09422999}
+  m_LocalScale: {x: 0.03908957, y: 0.01304092, z: 0.10422779}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5889140399933811673}

@@ -139,15 +139,20 @@ public class DragObject : MonoBehaviour
         {
             OnLetGoGood(this, Index);
             _outline.enabled = false;
+
             //fixing problem with infinity calling method OnLetGoGood when used mouse and keyboard
             _isUnderMap = true; 
         }
 
-
-        if (!GameController.Instance.IsOpenedPanelUI[Index])
+        if (!GameController.Instance.IsOpenedPanelUI[Index] && _outline.OutlineWidth != 0)
             foreach (int index in KeyboardAndJostickController.GetBButton())
                 if (index == Index && _isDragging)
                     LetGoItem();
+
+        if (GameController.Instance.IsOpenedPanelUI[Index])
+            _outline.OutlineWidth = 0;
+        else
+            _outline.OutlineWidth = OUTLINE_WIDTH;
 
         if (_isDragging && !GameController.Instance.IsOpenedPanelUI[Index])
             MoveGood();
