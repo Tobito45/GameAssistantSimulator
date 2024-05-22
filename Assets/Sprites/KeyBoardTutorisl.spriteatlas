@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: KeyBoardTutorisl
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 8
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 1
+      enableAlphaDilation: 1
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 9c60eeddcb9975a4682f6bf713052e41, type: 3}
+    - {fileID: 2800000, guid: 57eaf2e8f41853640921b4f27b2b97d4, type: 3}
+    - {fileID: 2800000, guid: a789656ffef6a644eb9633d2f9566aa4, type: 3}
+    - {fileID: 2800000, guid: 1f95fe9d3da86844bbe729f671c0a59e, type: 3}
+    - {fileID: 2800000, guid: 3a18aa101bd438b4b8904920f47e477e, type: 3}
+    - {fileID: 2800000, guid: 82daa729f102a484d991dbb6b3f0970a, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 3a18aa101bd438b4b8904920f47e477e, type: 3}
+  - {fileID: 21300000, guid: 57eaf2e8f41853640921b4f27b2b97d4, type: 3}
+  - {fileID: 21300000, guid: 82daa729f102a484d991dbb6b3f0970a, type: 3}
+  - {fileID: 21300000, guid: 1f95fe9d3da86844bbe729f671c0a59e, type: 3}
+  - {fileID: 21300000, guid: 9c60eeddcb9975a4682f6bf713052e41, type: 3}
+  - {fileID: 21300000, guid: a789656ffef6a644eb9633d2f9566aa4, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - tab_icon
+  - mouse_icon
+  - wasd_icon
+  - space_icon
+  - click_icon
+  - mouse_wheel_icon
+  m_RenderDataMap: {}
+  m_Tag: KeyBoardTutorisl
+  m_IsVariant: 0
